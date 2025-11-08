@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Deals - Contact Us</title>
+    <link rel="stylesheet" href="mystyle.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="common.js"></script>
+    <script src="contact.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Travel Deals</h1>
+            <div id="datetime"></div>
+        </header>
+
+        <nav class="horizontal-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stays.html">Stays</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="cars.html">Cars</a></li>
+                <li><a href="cruise.html">Cruise</a></li>
+                <li><a href="contact-us.html" class="active">Contact Us</a></li>
+                <li><a href="cart.html">Cart</a></li>
+            </ul>
+        </nav>
+
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>Quick Links</h3>
+                <div class="customization">
+                    <h4>Customize View</h4>
+                    <label for="fontSize">Font Size:</label>
+                    <select id="fontSize">
+                        <option value="14px">Small</option>
+                        <option value="16px" selected>Medium</option>
+                        <option value="18px">Large</option>
+                        <option value="20px">Extra Large</option>
+                    </select>
+                    <br><br>
+                    <label for="bgColor">Background Color:</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <h2>Contact Us</h2>
+                <p>Have questions or feedback? Fill out the form below and we'll get back to you shortly!</p>
+
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                        <div class="error" id="firstNameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                        <div class="error" id="lastNameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="text" id="phone" name="phone" placeholder="(123)456-7890" required>
+                        <div class="error" id="phoneError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gender *</label>
+                        <div class="gender-options">
+                            <label><input type="radio" name="gender" value="male"> Male</label>
+                            <label><input type="radio" name="gender" value="female"> Female</label>
+                            <label><input type="radio" name="gender" value="other"> Other</label>
+                        </div>
+                        <div class="error" id="genderError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                        <div class="error" id="emailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comment">Comment *</label>
+                        <textarea id="comment" name="comment" rows="5" required></textarea>
+                        <div class="error" id="commentError"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-submit">Submit</button>
+                    <div id="formMessage"></div>
+                </form>
+            </main>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Travel Deals. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
