@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Deals - Stays</title>
+    <link rel="stylesheet" href="mystyle.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="common.js"></script>
+    <script src="stays.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Travel Deals</h1>
+            <div id="datetime"></div>
+        </header>
+        
+        <nav class="horizontal-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stays.html" class="active">Stays</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="cars.html">Cars</a></li>
+                <li><a href="cruise.html">Cruise</a></li>
+                <li><a href="contact-us.html">Contact Us</a></li>
+                <li><a href="cart.html">Cart</a></li>
+            </ul>
+        </nav>
+        
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>Quick Links</h3>
+                <div class="customization">
+                    <h4>Customize View</h4>
+                    <label for="fontSize">Font Size:</label>
+                    <select id="fontSize">
+                        <option value="14px">Small</option>
+                        <option value="16px" selected>Medium</option>
+                        <option value="18px">Large</option>
+                        <option value="20px">Extra Large</option>
+                    </select>
+                    <br><br>
+                    <label for="bgColor">Background Color:</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+            </aside>
+            
+            <main class="main-content">
+                <h2>Find Your Perfect Stay</h2>
+                
+                <form id="staySearchForm">
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <select id="city" name="city" required>
+                            <option value="">Select a city</option>
+                            <optgroup label="Texas">
+                                <option value="Houston">Houston</option>
+                                <option value="Dallas">Dallas</option>
+                                <option value="Austin">Austin</option>
+                                <option value="San Antonio">San Antonio</option>
+                                <option value="Fort Worth">Fort Worth</option>
+                                <option value="El Paso">El Paso</option>
+                            </optgroup>
+                            <optgroup label="California">
+                                <option value="Los Angeles">Los Angeles</option>
+                                <option value="San Francisco">San Francisco</option>
+                                <option value="San Diego">San Diego</option>
+                                <option value="Sacramento">Sacramento</option>
+                                <option value="San Jose">San Jose</option>
+                                <option value="Fresno">Fresno</option>
+                            </optgroup>
+                        </select>
+                        <div id="cityError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="checkInDate">Check-in Date *</label>
+                        <input type="date" id="checkInDate" name="checkInDate" min="2024-09-01" max="2024-12-01" required>
+                        <div id="checkInError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="checkOutDate">Check-out Date *</label>
+                        <input type="date" id="checkOutDate" name="checkOutDate" min="2024-09-01" max="2024-12-01" required>
+                        <div id="checkOutError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h4>Number of Guests</h4>
+                        <label for="adultGuests">Adults (12+)</label>
+                        <input type="number" id="adultGuests" name="adultGuests" min="1" max="10" value="1">
+                        <div id="adultGuestsError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="childGuests">Children (2-11)</label>
+                        <input type="number" id="childGuests" name="childGuests" min="0" max="10" value="0">
+                        <div id="childGuestsError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="infantGuests">Infants (under 2)</label>
+                        <input type="number" id="infantGuests" name="infantGuests" min="0" max="10" value="0">
+                        <div id="infantGuestsError" class="error"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-submit">Search Hotels</button>
+                    
+                    <div id="searchMessage"></div>
+                </form>
+                
+                <div id="searchSummary" style="display:none;">
+                    <h3>Search Summary</h3>
+                    <div id="summaryContent"></div>
+                </div>
+                
+                <div id="hotelResults" class="flight-results" style="display:none;">
+                    <h3>Available Hotels</h3>
+                    <div id="resultsContent"></div>
+                </div>
+            </main>
+        </div>
+        
+        <footer>
+            <p>&copy; 2024 Travel Deals. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
