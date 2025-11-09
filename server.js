@@ -1,9 +1,11 @@
 const express = require("express");
+const cors = require("cors"); 
 const fs = require("fs");
 const path = require("path");
 const app = express();
 
-app.use(express.static("public")); // serve your html, css, js from 'public' folder
+app.use(cors()); 
+app.use(express.static("public"));
 app.use(express.json());
 
 // Handle POST request from contact.js

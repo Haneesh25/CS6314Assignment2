@@ -83,7 +83,7 @@ $(document).ready(function() {
         };
 
         // POST data to backend (Node.js)
-        fetch("/save-contact", {
+        fetch("http://localhost:3000/save-contact", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
