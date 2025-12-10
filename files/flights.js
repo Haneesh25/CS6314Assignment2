@@ -1,9 +1,7 @@
 let availableFlights = [];
 
 document.addEventListener('DOMContentLoaded', function() {
-
     initializeFlights();
-
 
     const tripTypeRadios = document.querySelectorAll('input[name="tripType"]');
     tripTypeRadios.forEach(radio => {
@@ -19,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-
     const passengerIcon = document.getElementById('passengerIcon');
     const passengerInfo = document.getElementById('passengerInfo');
 
@@ -31,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-
     const flightSearchForm = document.getElementById('flightSearchForm');
     if (flightSearchForm) {
         flightSearchForm.addEventListener('submit', function(event) {
@@ -42,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeFlights() {
-
     const flightData = [];
     const airlines = ['American Airlines', 'United Airlines', 'Southwest Airlines', 'Delta Airlines'];
     const texasCities = ['Houston', 'Dallas', 'Austin', 'San Antonio', 'Fort Worth', 'El Paso'];
@@ -50,65 +45,42 @@ function initializeFlights() {
 
     let flightId = 1000;
 
-
     for (let month = 9; month <= 12; month++) {
-        let maxDay = month === 12 ? 1 : 30;
-        if (month === 9 || month === 11) maxDay = 30;
-        if (month === 10) maxDay = 31;
-
-        for (let day = 1; day <= maxDay; day++) {
-
-            if (month === 12 && day > 1) break;
-
-
+        const daysInMonth = month === 9 ? 30 : (month === 11 ? 30 : 31);
+        for (let day = 1; day <= daysInMonth; day++) {
             for (let i = 0; i < 2; i++) {
-                const origin = texasCities[Math.floor(Math.random() * texasCities.length)];
-                const destination = californiaCities[Math.floor(Math.random() * californiaCities.length)];
+                const originIndex = Math.floor(Math.random() * texasCities.length);
+                const destIndex = Math.floor(Math.random() * californiaCities.length);
+                const origin = texasCities[originIndex];
+                const destination = californiaCities[destIndex];
                 const airline = airlines[Math.floor(Math.random() * airlines.length)];
+                const departureHour = Math.floor(Math.random() * 24);
+                const arrivalHour = (departureHour + 2) % 24;
 
-                const departureHour = 6 + Math.floor(Math.random() * 14);
-                const flightDuration = 2 + Math.random() * 2;
-                const arrivalHour = departureHour + Math.floor(flightDuration);
+                const dateStr = `2024-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
                 flightData.push({
-                    flightId: 'FL' + flightId++,
+                    flightId: flightId++,
                     airline: airline,
                     origin: origin,
                     destination: destination,
-                    departureDate: `2024-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-                    arrivalDate: `2024-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-                    departureTime: `${String(departureHour).padStart(2, '0')}:00`,
-                    arrivalTime: `${String(arrivalHour % 24).padStart(2, '0')}:30`,
-                    availableSeats: Math.floor(Math.random() * 20) + 5,
-                    price: 150 + Math.floor(Math.random() * 300)
-                });
-
-
-                flightData.push({
-                    flightId: 'FL' + flightId++,
-                    airline: airline,
-                    origin: destination,
-                    destination: origin,
-                    departureDate: `2024-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-                    arrivalDate: `2024-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-                    departureTime: `${String((departureHour + 6) % 24).padStart(2, '0')}:00`,
-                    arrivalTime: `${String((arrivalHour + 6) % 24).padStart(2, '0')}:30`,
-                    availableSeats: Math.floor(Math.random() * 20) + 5,
-                    price: 150 + Math.floor(Math.random() * 300)
+                    departureDate: dateStr,
+                    arrivalDate: dateStr,
+                    departureTime: `${String(departureHour).padStart(2, '0')}:00:00`,
+                    arrivalTime: `${String(arrivalHour).padStart(2, '0')}:30:00`,
+                    availableSeats: Math.floor(Math.random() * 100) + 10,
+                    price: Math.floor(Math.random() * 200) + 150
                 });
             }
         }
     }
-
 
     localStorage.setItem('availableFlights', JSON.stringify(flightData));
     availableFlights = flightData;
 }
 
 function searchFlights() {
-
     clearAllFlightErrors();
-
 
     const tripType = document.querySelector('input[name="tripType"]:checked').value;
     const origin = document.getElementById('origin').value;
@@ -121,12 +93,10 @@ function searchFlights() {
 
     let isValid = true;
 
-
     if (!origin) {
         showError('originError', 'Please select an origin city');
         isValid = false;
     }
-
 
     if (!destination) {
         showError('destinationError', 'Please select a destination city');
@@ -135,7 +105,6 @@ function searchFlights() {
         showError('destinationError', 'Origin and destination cannot be the same');
         isValid = false;
     }
-
 
     if (!departureDate) {
         showError('departureDateError', 'Please select a departure date');
@@ -150,7 +119,6 @@ function searchFlights() {
             isValid = false;
         }
     }
-
 
     if (tripType === 'roundtrip') {
         if (!returnDate) {
@@ -172,7 +140,6 @@ function searchFlights() {
         }
     }
 
-
     if (adults > 4) {
         showError('adultsError', 'Maximum 4 adults allowed');
         isValid = false;
@@ -186,36 +153,27 @@ function searchFlights() {
         isValid = false;
     }
 
-    const totalPassengers = adults + children;
+    const totalPassengers = adults + children + infants;
     if (totalPassengers === 0) {
-        showError('adultsError', 'At least one adult or child passenger required');
+        showError('adultsError', 'At least one passenger required');
         isValid = false;
     }
 
-    if (isValid) {
+    if (!isValid) return;
 
-        displaySearchSummary({
-            tripType,
-            origin,
-            destination,
-            departureDate,
-            returnDate,
-            adults,
-            children,
-            infants
-        });
+    // Display search summary
+    displaySearchSummary({
+        tripType,
+        origin,
+        destination,
+        departureDate,
+        returnDate,
+        adults,
+        children,
+        infants
+    });
 
-
-        findAvailableFlights({
-            tripType,
-            origin,
-            destination,
-            departureDate,
-            returnDate,
-            totalPassengers: adults + children + infants
-        });
-    }
-
+    // ONLY use server-side search - removed localStorage fallback
     $.ajax({
         url: 'flight-search.php',
         type: 'POST',
@@ -226,17 +184,22 @@ function searchFlights() {
             destination: destination,
             departureDate: departureDate,
             returnDate: returnDate,
-            totalPassengers: totalPassengers
+            adults: adults,
+            children: children,
+            infants: infants
         },
         success: function(response) {
             if (response.success) {
                 displayFlightResults(response.departingFlights, response.returningFlights, tripType);
             } else {
-                $('#flightResults').html('<p>'+response.message+'</p>').show();
+                $('#resultsContent').html('<p style="color: red;">' + response.message + '</p>');
+                $('#flightResults').show();
             }
         },
-        error: function() {
-            $('#flightResults').html('<p>Server error while searching for flights.</p>').show();
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            $('#resultsContent').html('<p style="color: red;">Server error while searching for flights.</p>');
+            $('#flightResults').show();
         }
     });
 }
@@ -267,107 +230,52 @@ function displaySearchSummary(searchData) {
     summaryDiv.style.display = 'block';
 }
 
-function findAvailableFlights(searchCriteria) {
-    const flightsData = JSON.parse(localStorage.getItem('availableFlights')) || [];
-
-
-    let departingFlights = flightsData.filter(flight =>
-        flight.origin === searchCriteria.origin &&
-        flight.destination === searchCriteria.destination &&
-        flight.departureDate === searchCriteria.departureDate &&
-        flight.availableSeats >= searchCriteria.totalPassengers
-    );
-
-
-    if (departingFlights.length === 0) {
-        const searchDate = new Date(searchCriteria.departureDate);
-        const minDate = new Date(searchDate);
-        minDate.setDate(minDate.getDate() - 3);
-        const maxDate = new Date(searchDate);
-        maxDate.setDate(maxDate.getDate() + 3);
-
-        departingFlights = flightsData.filter(flight => {
-            const flightDate = new Date(flight.departureDate);
-            return flight.origin === searchCriteria.origin &&
-                flight.destination === searchCriteria.destination &&
-                flightDate >= minDate &&
-                flightDate <= maxDate &&
-                flight.availableSeats >= searchCriteria.totalPassengers;
-        });
-    }
-
-    let returningFlights = [];
-    if (searchCriteria.tripType === 'roundtrip') {
-
-        returningFlights = flightsData.filter(flight =>
-            flight.origin === searchCriteria.destination &&
-            flight.destination === searchCriteria.origin &&
-            flight.departureDate === searchCriteria.returnDate &&
-            flight.availableSeats >= searchCriteria.totalPassengers
-        );
-
-
-        if (returningFlights.length === 0) {
-            const searchDate = new Date(searchCriteria.returnDate);
-            const minDate = new Date(searchDate);
-            minDate.setDate(minDate.getDate() - 3);
-            const maxDate = new Date(searchDate);
-            maxDate.setDate(maxDate.getDate() + 3);
-
-            returningFlights = flightsData.filter(flight => {
-                const flightDate = new Date(flight.departureDate);
-                return flight.origin === searchCriteria.destination &&
-                    flight.destination === searchCriteria.origin &&
-                    flightDate >= minDate &&
-                    flightDate <= maxDate &&
-                    flight.availableSeats >= searchCriteria.totalPassengers;
-            });
-        }
-    }
-
-    displayFlightResults(departingFlights, returningFlights, searchCriteria.tripType);
-}
-
 function displayFlightResults(departingFlights, returningFlights, tripType) {
     const resultsDiv = document.getElementById('flightResults');
     const resultsContent = document.getElementById('resultsContent');
 
+    // Check if elements exist
+    if (!resultsDiv || !resultsContent) {
+        console.error('Results elements not found in DOM');
+        return;
+    }
+
     let resultsHTML = '';
 
-    if (departingFlights.length === 0) {
+    if (!departingFlights || departingFlights.length === 0) {
         resultsHTML = '<p>No departing flights found for your search criteria.</p>';
     } else {
         resultsHTML = '<h4>Departing Flights</h4>';
         departingFlights.forEach(flight => {
             resultsHTML += `
                 <div class="flight-item">
-                    <p><strong>${flight.airline}</strong> - Flight ${flight.flightId}</p>
+                    <p><strong>${flight.airline}</strong> - Flight ${flight.flight_id}</p>
                     <p>${flight.origin} → ${flight.destination}</p>
-                    <p>Date: ${flight.departureDate}</p>
-                    <p>Departure: ${flight.departureTime} | Arrival: ${flight.arrivalTime}</p>
+                    <p>Date: ${flight.departure_date}</p>
+                    <p>Departure: ${flight.departure_time} | Arrival: ${flight.arrival_time}</p>
                     <p>Available Seats: ${flight.availableSeats}</p>
                     <p>Price: $${flight.price}</p>
-                    <button class="btn" onclick="selectFlight('${flight.flightId}', 'departing')">Select This Flight</button>
+                    <button class="btn" onclick="selectFlight('${flight.flight_id}', 'departing')">Select This Flight</button>
                 </div>
             `;
         });
     }
 
     if (tripType === 'roundtrip') {
-        if (returningFlights.length === 0) {
+        if (!returningFlights || returningFlights.length === 0) {
             resultsHTML += '<h4>Returning Flights</h4><p>No returning flights found for your search criteria.</p>';
         } else {
             resultsHTML += '<h4>Returning Flights</h4>';
             returningFlights.forEach(flight => {
                 resultsHTML += `
                     <div class="flight-item">
-                        <p><strong>${flight.airline}</strong> - Flight ${flight.flightId}</p>
+                        <p><strong>${flight.airline}</strong> - Flight ${flight.flight_id}</p>
                         <p>${flight.origin} → ${flight.destination}</p>
-                        <p>Date: ${flight.departureDate}</p>
-                        <p>Departure: ${flight.departureTime} | Arrival: ${flight.arrivalTime}</p>
+                        <p>Date: ${flight.departure_date}</p>
+                        <p>Departure: ${flight.departure_time} | Arrival: ${flight.arrival_time}</p>
                         <p>Available Seats: ${flight.availableSeats}</p>
                         <p>Price: $${flight.price}</p>
-                        <button class="btn" onclick="selectFlight('${flight.flightId}', 'returning')">Select This Flight</button>
+                        <button class="btn" onclick="selectFlight('${flight.flight_id}', 'returning')">Select This Flight</button>
                     </div>
                 `;
             });
@@ -379,68 +287,34 @@ function displayFlightResults(departingFlights, returningFlights, tripType) {
 }
 
 function selectFlight(flightId, type) {
-    const flightsData = JSON.parse(localStorage.getItem('availableFlights')) || [];
-    const flight = flightsData.find(f => f.flightId === flightId);
+    const adults = parseInt(document.getElementById('adults').value) || 1;
+    const children = parseInt(document.getElementById('children').value) || 0;
+    const infants = parseInt(document.getElementById('infants').value) || 0;
 
-    if (flight) {
-
-        const adults = parseInt(document.getElementById('adults').value) || 1;
-        const children = parseInt(document.getElementById('children').value) || 0;
-        const infants = parseInt(document.getElementById('infants').value) || 0;
-
-
-        let cart = JSON.parse(localStorage.getItem('flightCart')) || {};
-
-        if (type === 'departing') {
-            cart.departingFlight = {
-                ...flight,
-                adults: adults,
-                children: children,
-                infants: infants
-            };
+    $.post('flight-addcart.php', {
+        flightId: flightId,
+        type: type,
+        adults: adults,
+        children: children,
+        infants: infants
+    }, function(response) {
+        if (response.success) {
+            alert('Flight added to cart!');
+            window.location.href = 'cart.html';
         } else {
-            cart.returningFlight = {
-                ...flight,
-                adults: adults,
-                children: children,
-                infants: infants
-            };
+            alert('Error: ' + response.message);
         }
-
-        $.post('flight-addcart.php', {
-            flightId: flight.flightId,
-            type: type,
-            adults: adults,
-            children: children,
-            infants: infants
-        }, function(response) {
-            if (response.success) {
-                alert(response.message);
-                const tripType = $('input[name="tripType"]:checked').val();
-                if (tripType === 'oneway' || (tripType === 'roundtrip' && response.cart.departing && response.cart.returning)) {
-                    if (confirm('Go to cart to complete booking?')) {
-                        window.location.href = 'cart.html';
-                    }
-                }
-            } else {
-                alert('Error: ' + response.message);
-            }
-        }, 'json');
-
-
-
-        const tripType = document.querySelector('input[name="tripType"]:checked').value;
-        if (tripType === 'oneway' || (tripType === 'roundtrip' && cart.departingFlight && cart.returningFlight)) {
-            if (confirm('Would you like to go to the cart to complete your booking?')) {
-                window.location.href = 'cart.html';
-            }
-        }
-    }
+    }, 'json').fail(function() {
+        alert('Error adding flight to cart');
+    });
 }
 
 function clearAllFlightErrors() {
-    const errorElements = document.querySelectorAll('.error');
-    errorElements.forEach(element => {
-        element.textContent = '';
-    });
+    document.getElementById('originError').textContent = '';
+    document.getElementById('destinationError').textContent = '';
+    document.getElementById('departureDateError').textContent = '';
+    document.getElementById('returnDateError').textContent = '';
+    document.getElementById('adultsError').textContent = '';
+    document.getElementById('childrenError').textContent = '';
+    document.getElementById('infantsError').textContent = '';
 }
