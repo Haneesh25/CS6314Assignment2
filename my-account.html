@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Deals - My Account</title>
+    <link rel="stylesheet" href="mystyle.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="common.js"></script>
+    <script src="my-account.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Travel Deals</h1>
+            <div id="datetime"></div>
+            <div id="userWelcome" style="color: white; margin-top: 10px;"></div>
+        </header>
+        
+        <nav class="horizontal-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stays.html">Stays</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="cars.html">Cars</a></li>
+                <li><a href="cruise.html">Cruise</a></li>
+                <li><a href="contact-us.html">Contact Us</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="my-account.html" class="active">My Account</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+        
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>Quick Links</h3>
+                <div class="customization">
+                    <h4>Customize View</h4>
+                    <label for="fontSize">Font Size:</label>
+                    <select id="fontSize">
+                        <option value="14px">Small</option>
+                        <option value="16px" selected>Medium</option>
+                        <option value="18px">Large</option>
+                        <option value="20px">Extra Large</option>
+                    </select>
+                    <br><br>
+                    <label for="bgColor">Background Color:</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+            </aside>
+            
+            <main class="main-content">
+                <div id="loginRequired" style="display:none;">
+                    <h2>Please Login</h2>
+                    <p>You must be logged in to view your account.</p>
+                    <a href="login.html" class="btn">Go to Login</a>
+                </div>
+
+                <div id="accountContent" style="display:none;">
+                    <h2>My Account</h2>
+                    
+                    <!-- User Queries Section -->
+                    <div id="userQueries" style="display:none;">
+                        <h3>My Bookings</h3>
+                        
+                        <!-- Query 1: Get booking by ID -->
+                        <div class="query-section">
+                            <h4>Search Booking by ID</h4>
+                            <form id="bookingByIdForm">
+                                <div class="form-group">
+                                    <label>Booking Type:</label>
+                                    <select id="bookingType">
+                                        <option value="flight">Flight Booking</option>
+                                        <option value="hotel">Hotel Booking</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Booking ID:</label>
+                                    <input type="text" id="bookingId" placeholder="e.g., FLIGHT_123456789">
+                                </div>
+                                <button type="submit" class="btn">Search</button>
+                            </form>
+                            <div id="bookingByIdResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Query 2: Get passengers by flight booking ID -->
+                        <div class="query-section">
+                            <h4>View Passengers in Flight Booking</h4>
+                            <form id="passengersByBookingForm">
+                                <div class="form-group">
+                                    <label>Flight Booking ID:</label>
+                                    <input type="text" id="passengerBookingId" placeholder="e.g., FLIGHT_123456789">
+                                </div>
+                                <button type="submit" class="btn">Search</button>
+                            </form>
+                            <div id="passengersByBookingResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Query 3: All bookings for September 2024 -->
+                        <div class="query-section">
+                            <h4>My September 2024 Bookings</h4>
+                            <button class="btn" id="septemberBookingsBtn">View September Bookings</button>
+                            <div id="septemberBookingsResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Query 4: Bookings by SSN -->
+                        <div class="query-section">
+                            <h4>Search by Passenger SSN</h4>
+                            <form id="bookingsBySSNForm">
+                                <div class="form-group">
+                                    <label>SSN:</label>
+                                    <input type="text" id="searchSSN" placeholder="123-45-6789">
+                                </div>
+                                <button type="submit" class="btn">Search</button>
+                            </form>
+                            <div id="bookingsBySSNResult" class="result-section"></div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Queries Section -->
+                    <div id="adminQueries" style="display:none;">
+                        <h3>Admin Dashboard</h3>
+
+                        <!-- Admin Data Loading -->
+                        <div class="query-section">
+                            <h4>Load Data into Database</h4>
+                            <button class="btn" id="loadFlightsBtn">Load Flights JSON to Database</button>
+                            <button class="btn" id="loadHotelsBtn">Load Hotels XML to Database</button>
+                            <div id="loadDataResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Admin Query 1: Texas departures Sep-Oct 2024 -->
+                        <div class="query-section">
+                            <h4>Flights Departing from Texas (Sep-Oct 2024)</h4>
+                            <button class="btn" id="texasDeparturesBtn">View Texas Departures</button>
+                            <div id="texasDeparturesResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Admin Query 2: Texas hotels Sep-Oct 2024 -->
+                        <div class="query-section">
+                            <h4>Hotel Bookings in Texas (Sep-Oct 2024)</h4>
+                            <button class="btn" id="texasHotelsBtn">View Texas Hotels</button>
+                            <div id="texasHotelsResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Admin Query 3: Most expensive hotels -->
+                        <div class="query-section">
+                            <h4>Most Expensive Hotel Bookings</h4>
+                            <button class="btn" id="expensiveHotelsBtn">View Expensive Hotels</button>
+                            <div id="expensiveHotelsResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Admin Query 4: Flights with infant passengers -->
+                        <div class="query-section">
+                            <h4>Flights with Infant Passengers</h4>
+                            <button class="btn" id="infantFlightsBtn">View Infant Flights</button>
+                            <div id="infantFlightsResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Admin Query 5: Flights with infant + at least 5 children -->
+                        <div class="query-section">
+                            <h4>Flights with Infant + At Least 5 Children</h4>
+                            <button class="btn" id="infantChildrenFlightsBtn">View These Flights</button>
+                            <div id="infantChildrenFlightsResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Admin Query 6: Most expensive flights -->
+                        <div class="query-section">
+                            <h4>Most Expensive Flight Bookings</h4>
+                            <button class="btn" id="expensiveFlightsBtn">View Expensive Flights</button>
+                            <div id="expensiveFlightsResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Admin Query 7: Texas departures with no infants -->
+                        <div class="query-section">
+                            <h4>Texas Departures with No Infant Passengers</h4>
+                            <button class="btn" id="texasNoInfantsBtn">View These Flights</button>
+                            <div id="texasNoInfantsResult" class="result-section"></div>
+                        </div>
+
+                        <!-- Admin Query 8: Count California arrivals -->
+                        <div class="query-section">
+                            <h4>Count of Flights Arriving in California (Sep-Oct 2024)</h4>
+                            <button class="btn" id="californiaArrivalsBtn">View Count</button>
+                            <div id="californiaArrivalsResult" class="result-section"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+        <footer>
+            <p>&copy; 2024 Travel Deals. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

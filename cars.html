@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Deals - Cars</title>
+    <link rel="stylesheet" href="mystyle.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="common.js"></script>
+    <script src="cars.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Travel Deals</h1>
+            <div id="datetime"></div>
+        </header>
+        
+        <nav class="horizontal-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stays.html">Stays</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="cars.html" class="active">Cars</a></li>
+                <li><a href="cruise.html">Cruise</a></li>
+                <li><a href="contact-us.html">Contact Us</a></li>
+                <li><a href="cart.html">Cart</a></li>
+            </ul>
+        </nav>
+        
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>Quick Links</h3>
+                <div class="customization">
+                    <h4>Customize View</h4>
+                    <label for="fontSize">Font Size:</label>
+                    <select id="fontSize">
+                        <option value="14px">Small</option>
+                        <option value="16px" selected>Medium</option>
+                        <option value="18px">Large</option>
+                        <option value="20px">Extra Large</option>
+                    </select>
+                    <br><br>
+                    <label for="bgColor">Background Color:</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+            </aside>
+            
+            <main class="main-content">
+                <h2>Rent a Car</h2>
+                
+                <form id="carSearchForm">
+                    <div class="form-group">
+                        <label for="carCity">City *</label>
+                        <select id="carCity" name="carCity" required>
+                            <option value="">Select a city</option>
+                            <optgroup label="Texas">
+                                <option value="Houston">Houston</option>
+                                <option value="Dallas">Dallas</option>
+                                <option value="Austin">Austin</option>
+                                <option value="San Antonio">San Antonio</option>
+                                <option value="Fort Worth">Fort Worth</option>
+                                <option value="El Paso">El Paso</option>
+                            </optgroup>
+                            <optgroup label="California">
+                                <option value="Los Angeles">Los Angeles</option>
+                                <option value="San Francisco">San Francisco</option>
+                                <option value="San Diego">San Diego</option>
+                                <option value="Sacramento">Sacramento</option>
+                                <option value="San Jose">San Jose</option>
+                                <option value="Fresno">Fresno</option>
+                            </optgroup>
+                        </select>
+                        <div id="carCityError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carType">Type of Car *</label>
+                        <select id="carType" name="carType" required>
+                            <option value="">Select car type</option>
+                            <option value="Economy">Economy</option>
+                            <option value="Compact">Compact</option>
+                            <option value="Midsize">Midsize</option>
+                            <option value="SUV">SUV</option>
+                        </select>
+                        <div id="carTypeError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carCheckIn">Pick-up Date *</label>
+                        <input type="date" id="carCheckIn" name="carCheckIn" min="2024-09-01" max="2024-12-01" required>
+                        <div id="carCheckInError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carCheckOut">Drop-off Date *</label>
+                        <input type="date" id="carCheckOut" name="carCheckOut" min="2024-09-01" max="2024-12-01" required>
+                        <div id="carCheckOutError" class="error"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-submit">Search Cars</button>
+                    
+                    <div id="searchMessage"></div>
+                </form>
+                
+                <div id="searchSummary" style="display:none;">
+                    <h3>Search Summary</h3>
+                    <div id="summaryContent"></div>
+                </div>
+                
+                <div id="suggestedCars" style="display:none;">
+                    <h3>Suggested Cars Based on Your Preferences</h3>
+                    <div id="suggestedContent"></div>
+                </div>
+                
+                <div id="carResults" class="flight-results" style="display:none;">
+                    <h3>Available Cars</h3>
+                    <div id="resultsContent"></div>
+                </div>
+            </main>
+        </div>
+        
+        <footer>
+            <p>&copy; 2024 Travel Deals. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

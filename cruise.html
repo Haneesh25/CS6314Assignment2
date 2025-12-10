@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Deals - Cruise</title>
+    <link rel="stylesheet" href="mystyle.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="common.js"></script>
+    <script src="cruise.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Travel Deals</h1>
+            <div id="datetime"></div>
+        </header>
+        
+        <nav class="horizontal-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stays.html">Stays</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="cars.html">Cars</a></li>
+                <li><a href="cruise.html" class="active">Cruise</a></li>
+                <li><a href="contact-us.html">Contact Us</a></li>
+                <li><a href="cart.html">Cart</a></li>
+            </ul>
+        </nav>
+        
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>Quick Links</h3>
+                <div class="customization">
+                    <h4>Customize View</h4>
+                    <label for="fontSize">Font Size:</label>
+                    <select id="fontSize">
+                        <option value="14px">Small</option>
+                        <option value="16px" selected>Medium</option>
+                        <option value="18px">Large</option>
+                        <option value="20px">Extra Large</option>
+                    </select>
+                    <br><br>
+                    <label for="bgColor">Background Color:</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+            </aside>
+            
+            <main class="main-content">
+                <h2>Find Your Dream Cruise</h2>
+                
+                <form id="cruiseSearchForm">
+                    <div class="form-group">
+                        <label for="cruiseDestination">Destination *</label>
+                        <select id="cruiseDestination" name="cruiseDestination" required>
+                            <option value="">Select a destination</option>
+                            <option value="Alaska">Alaska</option>
+                            <option value="Bahamas">Bahamas</option>
+                            <option value="Europe">Europe</option>
+                            <option value="Mexico">Mexico</option>
+                        </select>
+                        <div id="destinationError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Duration of Cruise (days)</label>
+                        <div style="display: flex; gap: 20px;">
+                            <div style="flex: 1;">
+                                <label for="minDuration">Minimum</label>
+                                <input type="number" id="minDuration" name="minDuration" min="3" max="10" value="3" required>
+                                <div id="minDurationError" class="error"></div>
+                            </div>
+                            <div style="flex: 1;">
+                                <label for="maxDuration">Maximum</label>
+                                <input type="number" id="maxDuration" name="maxDuration" min="3" max="10" value="7" required>
+                                <div id="maxDurationError" class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Departing Between</label>
+                        <div style="display: flex; gap: 20px;">
+                            <div style="flex: 1;">
+                                <label for="departStartDate">Start Date</label>
+                                <input type="date" id="departStartDate" name="departStartDate" min="2024-09-01" max="2024-12-01" required>
+                                <div id="departStartError" class="error"></div>
+                            </div>
+                            <div style="flex: 1;">
+                                <label for="departEndDate">End Date</label>
+                                <input type="date" id="departEndDate" name="departEndDate" min="2024-09-01" max="2024-12-01" required>
+                                <div id="departEndError" class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h4>Number of Guests per Category</h4>
+                        <label for="cruiseAdults">Adults (12+)</label>
+                        <input type="number" id="cruiseAdults" name="cruiseAdults" min="1" max="10" value="1">
+                        <div id="cruiseAdultsError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cruiseChildren">Children (2-11)</label>
+                        <input type="number" id="cruiseChildren" name="cruiseChildren" min="0" max="10" value="0">
+                        <div id="cruiseChildrenError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cruiseInfants">Infants (under 2)</label>
+                        <input type="number" id="cruiseInfants" name="cruiseInfants" min="0" max="10" value="0">
+                        <div id="cruiseInfantsError" class="error"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-submit">Search Cruises</button>
+                    
+                    <div id="searchMessage"></div>
+                </form>
+                
+                <div id="searchSummary" style="display:none;">
+                    <h3>Search Summary</h3>
+                    <div id="summaryContent"></div>
+                </div>
+                
+                <div id="cruiseResults" class="flight-results" style="display:none;">
+                    <h3>Available Cruises</h3>
+                    <div id="resultsContent"></div>
+                </div>
+            </main>
+        </div>
+        
+        <footer>
+            <p>&copy; 2024 Travel Deals. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

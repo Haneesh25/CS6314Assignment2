@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Deals - Cart</title>
+    <link rel="stylesheet" href="mystyle.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="common.js"></script>
+    <script src="cart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Travel Deals</h1>
+            <div id="datetime"></div>
+        </header>
+
+        <nav class="horizontal-nav">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="stays.html">Stays</a></li>
+                <li><a href="flights.html">Flights</a></li>
+                <li><a href="cars.html">Cars</a></li>
+                <li><a href="cruise.html">Cruise</a></li>
+                <li><a href="contact-us.html">Contact Us</a></li>
+                <li><a href="cart.html" class="active">Cart</a></li>
+            </ul>
+        </nav>
+
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>Quick Links</h3>
+                <div class="customization">
+                    <h4>Customize View</h4>
+                    <label for="fontSize">Font Size:</label>
+                    <select id="fontSize">
+                        <option value="14px">Small</option>
+                        <option value="16px" selected>Medium</option>
+                        <option value="18px">Large</option>
+                        <option value="20px">Extra Large</option>
+                    </select>
+                    <br><br>
+                    <label for="bgColor">Background Color:</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <h2>Your Shopping Cart</h2>
+
+                <div id="cartContent">
+                    <div id="flightCartSection" style="display:none;">
+                        <h3>Flight Booking</h3>
+                        <div id="flightCartContent"></div>
+                        <div id="flightPassengerForm" style="display:none;">
+                            <h4>Passenger Information</h4>
+                            <form id="flightBookingForm">
+                                <div id="passengerFields"></div>
+                                <button type="submit" class="btn btn-submit">Book Flight</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="hotelCartSection" style="display:none;">
+                        <h3>Hotel Booking</h3>
+                        <div id="hotelCartContent"></div>
+                        <button id="bookHotelBtn" class="btn btn-submit">Book Hotel</button>
+                    </div>
+
+                    <div id="carCartSection" style="display:none;">
+                        <h3>Car Rental Booking</h3>
+                        <div id="carCartContent"></div>
+                        <button id="bookCarBtn" class="btn btn-submit">Book Car</button>
+                    </div>
+
+                    <div id="cruiseCartSection" style="display:none;">
+                        <h3>Cruise Booking</h3>
+                        <div id="cruiseCartContent"></div>
+                        <button id="bookCruiseBtn" class="btn btn-submit">Book Cruise</button>
+                    </div>
+
+                    <div id="emptyCart" style="display:none;">
+                        <p>Your cart is empty. Start booking your travel!</p>
+                        <div style="margin-top: 20px;">
+                            <a href="flights.html" class="btn">Search Flights</a>
+                            <a href="stays.html" class="btn">Search Hotels</a>
+                            <a href="cars.html" class="btn">Search Cars</a>
+                            <a href="cruise.html" class="btn">Search Cruises</a>
+                        </div>
+                    </div>
+
+                    <div id="cartTotal" class="cart-total" style="display:none;">
+                        Total: $<span id="totalAmount">0.00</span>
+                    </div>
+
+                    <div id="bookingConfirmation" style="display:none;">
+                        <h3>Booking Confirmation</h3>
+                        <div id="confirmationDetails"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Travel Deals. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+
+</html>
