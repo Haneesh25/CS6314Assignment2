@@ -18,7 +18,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateDateTime();
     setInterval(updateDateTime, 1000);
-
+    
+    // Check if user is logged in via PHP session
+    fetch('check-session.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.loggedIn) {
+                document.getElementById('userInfo').innerHTML = 
+                    `Welcome, ${data.firstName} ${data.lastName} | <a href="logout.php">Logout</a>`;
+            } else {
+                document.getElementById('userInfo').innerHTML = 
+                    `<a href="login.html">Login</a> | <a href="register.html">Register</a>`;
+            }
+        })
+        .catch(err => {
+            console.error('Session check failed:', err);
+        });
 
     const fontSizeSelect = document.getElementById('fontSize');
     if (fontSizeSelect) {
