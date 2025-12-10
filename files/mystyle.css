@@ -36,6 +36,29 @@ header h1 {
     color: #ecf0f1;
 }
 
+.header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+#userInfo {
+    color: #ecf0f1;
+}
+
+#userInfo a {
+    color: #3498db;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+#userInfo a:hover {
+    color: #5dade2;
+    text-decoration: underline;
+}
+
 .horizontal-nav {
     background-color: #34495e;
 }
