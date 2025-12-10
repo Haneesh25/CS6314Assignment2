@@ -1,0 +1,26 @@
+[
+    {
+        "flightId": "FL1000",
+        "airline": "American Airlines",
+        "origin": "Houston",
+        "destination": "Los Angeles",
+        "departureDate": "2024-09-01",
+        "arrivalDate": "2024-09-01",
+        "departureTime": "08:00",
+        "arrivalTime": "10:30",
+        "availableSeats": 15,
+        "price": 200
+    },
+    {
+        "flightId": "FL1001",
+        "airline": "United Airlines",
+        "origin": "Dallas",
+        "destination": "San Francisco",
+        "departureDate": "2024-09-01",
+        "arrivalDate": "2024-09-01",
+        "departureTime": "09:00",
+        "arrivalTime": "11:30",
+        "availableSeats": 12,
+        "price": 220
+    }
+]
