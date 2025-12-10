@@ -16,7 +16,7 @@ if (!$flights) { echo "Invalid JSON"; exit; }
 // Insert each flight
 $stmt = $conn->prepare("INSERT INTO flights (flight_id, airline, origin, destination, departure_date, arrival_date, departure_time, arrival_time, availableSeats, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 foreach ($flights as $f) {
-    $stmt->bind_param("isssssssii", $f['flight_id'], $f['airline'], $f['origin'], $f['destination'], $f['departure_date'], $f['arrival_date'], $f['departure_time'], $f['arrival_time'], $f['availableSeats'], $f['price']);
+    $stmt->bind_param("ssssssssii", $f['flight_id'], $f['airline'], $f['origin'], $f['destination'], $f['departure_date'], $f['arrival_date'], $f['departure_time'], $f['arrival_time'], $f['availableSeats'], $f['price']);
     $stmt->execute();
 }
 
