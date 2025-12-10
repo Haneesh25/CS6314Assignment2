@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
+    // Check and display logged-in user
+    checkAndDisplayUser();
 
     const fontSizeSelect = document.getElementById('fontSize');
     if (fontSizeSelect) {
@@ -53,6 +55,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Function to check if user is logged in and display their name
+function checkAndDisplayUser() {
+    if (typeof $ !== 'undefined') {
+        $.ajax({
+            url: 'check-session.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.loggedIn) {
+                    // Display user name in header
+                    const header = document.querySelector('header');
+                    let userDiv = document.getElementById('userWelcome');
+                    if (!userDiv && header) {
+                        userDiv = document.createElement('div');
+                        userDiv.id = 'userWelcome';
+                        userDiv.style.color = 'white';
+                        userDiv.style.marginTop = '10px';
+                        userDiv.style.fontSize = '14px';
+                        header.appendChild(userDiv);
+                    }
+                    if (userDiv) {
+                        userDiv.textContent = 'Welcome, ' + response.firstName + ' ' + response.lastName;
+                    }
+                }
+            }
+        });
+    }
+}
 
 
 function generateUniqueId(prefix) {

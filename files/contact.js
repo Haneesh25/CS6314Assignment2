@@ -1,4 +1,18 @@
 $(document).ready(function() {
+    // Check if user is logged in first
+    $.ajax({
+        url: 'check-session.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (!response.loggedIn) {
+                // User not logged in - show message
+                $("#contactForm").hide();
+                $("#formMessage").css("color", "red").html('Please <a href="login.html">login</a> to submit a comment.');
+            }
+        }
+    });
+
     $("#contactForm").submit(function(event) {
         event.preventDefault(); // Prevent default form submission
         
@@ -59,7 +73,7 @@ $(document).ready(function() {
             isValid = false;
         }
 
-        // Comment
+        // Comment - MUST be at least 10 characters
         if (comment.length < 10) {
             $("#commentError").text("Comment must be at least 10 characters long.");
             isValid = false;
@@ -71,37 +85,31 @@ $(document).ready(function() {
             return;
         }
 
-        // --- IF VALID, SAVE DATA ---
-        const formData = {
-            firstName,
-            lastName,
-            phone,
-            gender,
-            email,
-            comment,
-            timestamp: new Date().toISOString()
-        };
-
-        // POST data to backend (Node.js)
-        fetch("http://localhost:3000/save-contact", {
+        // --- IF VALID, SAVE DATA to XML via PHP ---
+        $.ajax({
+            url: "save-contact.php",
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+            data: {
+                firstName: firstName,
+                lastName: lastName,
+                phone: phone,
+                gender: gender,
+                email: email,
+                comment: comment
             },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                $("#formMessage").css("color", "green").text("Form submitted successfully!");
-                $("#contactForm")[0].reset();
-            } else {
-                $("#formMessage").css("color", "red").text("Error saving data. Please try again.");
+            dataType: "json",
+            success: function(data) {
+                if (data.success) {
+                    $("#formMessage").css("color", "green").text(data.message);
+                    $("#contactForm")[0].reset();
+                } else {
+                    $("#formMessage").css("color", "red").text(data.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error:", error);
+                $("#formMessage").css("color", "red").text("Server error. Please try again later.");
             }
-        })
-        .catch(err => {
-            console.error("Error:", err);
-            $("#formMessage").css("color", "red").text("Server error. Please try again later.");
         });
     });
 });

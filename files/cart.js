@@ -254,66 +254,169 @@ function bookFlight() {
     const flightCart = JSON.parse(localStorage.getItem('flightCart'));
     const passengers = [];
 
+    // Collect passenger data
+    $('.passenger-section').each(function(index) {
+        const typeText = $(this).find('h5').text();
+        const category = typeText.includes('Adult') ? 'adult' :
+            typeText.includes('Child') ? 'child' : 'infant';
 
-    $('.passenger-section').each(function() {
+        const flight = flightCart.departingFlight || flightCart.returningFlight;
+        let price = flight.price;
+        if (category === 'child') price = flight.price * 0.7;
+        if (category === 'infant') price = flight.price * 0.1;
+
         passengers.push({
+            ticketId: generateUniqueId('TICKET'),
             firstName: $(this).find('.passenger-first-name').val(),
             lastName: $(this).find('.passenger-last-name').val(),
             dob: $(this).find('.passenger-dob').val(),
-            ssn: $(this).find('.passenger-ssn').val()
+            ssn: $(this).find('.passenger-ssn').val(),
+            category: category,
+            price: price
         });
     });
 
+    const flightBookingId = generateUniqueId('FLIGHT');
 
-    const bookingNumber = generateUniqueId('FLIGHT');
-    const userId = generateUniqueId('USER');
+    // Calculate total price
+    let totalPrice = 0;
+    passengers.forEach(p => totalPrice += parseFloat(p.price));
 
-    const booking = {
-        userId: userId,
-        bookingNumber: bookingNumber,
-        departingFlight: flightCart.departingFlight,
-        returningFlight: flightCart.returningFlight,
-        passengers: passengers,
-        bookingDate: new Date().toISOString()
+    // Prepare booking data for database
+    const bookingData = {
+        flightBookingId: flightBookingId,
+        flightId: flightCart.departingFlight.flightId,
+        totalPrice: totalPrice,
+        passengers: passengers
     };
 
+    // Save to database via AJAX
+    $.ajax({
+        url: 'book-flight.php',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(bookingData),
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                // Also save returning flight if exists
+                if (flightCart.returningFlight) {
+                    const returnBookingData = {
+                        flightBookingId: generateUniqueId('FLIGHT'),
+                        flightId: flightCart.returningFlight.flightId,
+                        totalPrice: totalPrice,
+                        passengers: passengers
+                    };
 
-    saveToStorage('flightBookings', booking);
-
-
-    updateFlightAvailability(flightCart);
-
-
-    localStorage.removeItem('flightCart');
-
-
-    showBookingConfirmation('Flight', booking);
+                    $.ajax({
+                        url: 'book-flight.php',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(returnBookingData),
+                        dataType: 'json',
+                        success: function() {
+                            localStorage.removeItem('flightCart');
+                            showBookingConfirmation('Flight', {
+                                bookingNumber: response.bookingId,
+                                userId: generateUniqueId('USER'),
+                                bookingDate: new Date().toISOString()
+                            });
+                        },
+                        error: function() {
+                            alert('Error booking return flight');
+                        }
+                    });
+                } else {
+                    localStorage.removeItem('flightCart');
+                    showBookingConfirmation('Flight', {
+                        bookingNumber: response.bookingId,
+                        userId: generateUniqueId('USER'),
+                        bookingDate: new Date().toISOString()
+                    });
+                }
+            } else {
+                alert('Booking failed: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('Error connecting to server. Please try again.');
+        }
+    });
 }
+
 
 function bookHotel() {
     const hotelCart = JSON.parse(localStorage.getItem('hotelCart'));
-    const bookingNumber = generateUniqueId('HOTEL');
-    const userId = generateUniqueId('USER');
+    const hotelBookingId = generateUniqueId('HOTEL');
 
-    const booking = {
-        userId: userId,
-        bookingNumber: bookingNumber,
-        ...hotelCart,
-        bookingDate: new Date().toISOString()
+    // Create guest data (simplified - using dummy SSNs)
+    const guests = [];
+    for (let i = 0; i < hotelCart.adultGuests; i++) {
+        guests.push({
+            ssn: '000-00-' + String(1000 + i + Math.floor(Math.random() * 9000)).padStart(4, '0'),
+            firstName: 'Guest',
+            lastName: 'Adult' + (i + 1),
+            dob: '1990-01-01',
+            category: 'adult'
+        });
+    }
+    for (let i = 0; i < hotelCart.childGuests; i++) {
+        guests.push({
+            ssn: '000-00-' + String(2000 + i + Math.floor(Math.random() * 9000)).padStart(4, '0'),
+            firstName: 'Guest',
+            lastName: 'Child' + (i + 1),
+            dob: '2010-01-01',
+            category: 'child'
+        });
+    }
+    for (let i = 0; i < hotelCart.infantGuests; i++) {
+        guests.push({
+            ssn: '000-00-' + String(3000 + i + Math.floor(Math.random() * 9000)).padStart(4, '0'),
+            firstName: 'Guest',
+            lastName: 'Infant' + (i + 1),
+            dob: '2022-01-01',
+            category: 'infant'
+        });
+    }
+
+    const bookingData = {
+        hotelBookingId: hotelBookingId,
+        hotelId: hotelCart.hotel.hotelId,
+        checkInDate: hotelCart.checkInDate,
+        checkOutDate: hotelCart.checkOutDate,
+        numberOfRooms: hotelCart.roomsNeeded,
+        pricePerNight: hotelCart.hotel.pricePerNight,
+        totalPrice: hotelCart.totalPrice,
+        guests: guests
     };
 
-
-    saveToStorage('hotelBookings', booking);
-
-
-    updateHotelAvailability(hotelCart);
-
-
-    localStorage.removeItem('hotelCart');
-
-
-    showBookingConfirmation('Hotel', booking);
+    // Save to database via AJAX
+    $.ajax({
+        url: 'book-hotel.php',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(bookingData),
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                localStorage.removeItem('hotelCart');
+                showBookingConfirmation('Hotel', {
+                    bookingNumber: response.bookingId,
+                    userId: generateUniqueId('USER'),
+                    bookingDate: new Date().toISOString()
+                });
+            } else {
+                alert('Booking failed: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('Error connecting to server. Please try again.');
+        }
+    });
 }
+
 
 function bookCar() {
     const carCart = JSON.parse(localStorage.getItem('carCart'));
