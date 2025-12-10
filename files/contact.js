@@ -71,37 +71,26 @@ $(document).ready(function() {
             return;
         }
 
-        // --- IF VALID, SAVE DATA ---
-        const formData = {
-            firstName,
-            lastName,
-            phone,
-            gender,
-            email,
-            comment,
-            timestamp: new Date().toISOString()
-        };
-
-        // POST data to backend (Node.js)
-        fetch("http://localhost:3000/save-contact", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+        // --- AJAX to PHP ---
+        $.ajax({
+            url: "contact.php",
+            type: "POST",
+            data: {
+                firstName,
+                lastName,
+                phone,
+                gender,
+                email,
+                comment
             },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                $("#formMessage").css("color", "green").text("Form submitted successfully!");
+            success: function(response) {
+                $("#formMessage").css("color", "green").text(response);
                 $("#contactForm")[0].reset();
-            } else {
-                $("#formMessage").css("color", "red").text("Error saving data. Please try again.");
+            },
+            error: function() {
+                $("#formMessage").css("color", "red").text("Server error. Please try again later.");
             }
-        })
-        .catch(err => {
-            console.error("Error:", err);
-            $("#formMessage").css("color", "red").text("Server error. Please try again later.");
         });
+        
     });
 });

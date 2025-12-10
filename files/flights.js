@@ -215,6 +215,30 @@ function searchFlights() {
             totalPassengers: adults + children + infants
         });
     }
+
+    $.ajax({
+        url: 'flight-search.php',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            tripType: tripType,
+            origin: origin,
+            destination: destination,
+            departureDate: departureDate,
+            returnDate: returnDate,
+            totalPassengers: totalPassengers
+        },
+        success: function(response) {
+            if (response.success) {
+                displayFlightResults(response.departingFlights, response.returningFlights, tripType);
+            } else {
+                $('#flightResults').html('<p>'+response.message+'</p>').show();
+            }
+        },
+        error: function() {
+            $('#flightResults').html('<p>Server error while searching for flights.</p>').show();
+        }
+    });
 }
 
 function displaySearchSummary(searchData) {
@@ -383,9 +407,26 @@ function selectFlight(flightId, type) {
             };
         }
 
-        localStorage.setItem('flightCart', JSON.stringify(cart));
+        $.post('flight-addcart.php', {
+            flightId: flight.flightId,
+            type: type,
+            adults: adults,
+            children: children,
+            infants: infants
+        }, function(response) {
+            if (response.success) {
+                alert(response.message);
+                const tripType = $('input[name="tripType"]:checked').val();
+                if (tripType === 'oneway' || (tripType === 'roundtrip' && response.cart.departing && response.cart.returning)) {
+                    if (confirm('Go to cart to complete booking?')) {
+                        window.location.href = 'cart.html';
+                    }
+                }
+            } else {
+                alert('Error: ' + response.message);
+            }
+        }, 'json');
 
-        alert(`Flight ${flightId} added to cart!`);
 
 
         const tripType = document.querySelector('input[name="tripType"]:checked').value;

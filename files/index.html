@@ -15,6 +15,14 @@
         <header>
             <h1>Travel Deals</h1>
             <div id="datetime"></div>
+            <div id="userInfo">
+                <?php
+                session_start();
+                if (isset($_SESSION['currentUser'])) {
+                    echo "Welcome, " . htmlspecialchars($_SESSION['currentUser']['firstName']) . " " . htmlspecialchars($_SESSION['currentUser']['lastName']);
+                }
+                ?>
+            </div>
         </header>
 
         <nav class="horizontal-nav">

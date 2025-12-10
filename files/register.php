@@ -7,33 +7,78 @@ $dbname = "travel_deals";
 $conn = new mysqli($host, $user, $pass, $dbname);
 
 if ($conn->connect_error) {
-    die("Database connection failed");
+    die("Database connection failed: " . $conn->connect_error);
 }
 
-$firstName = $_POST['firstName'];
-$lastName = $_POST['lastName'];
-$email = $_POST['email'];
-$dob = $_POST['dob'];
-$gender = $_POST['gender'];
-$phone = $_POST['phone'];
-$password = $_POST['password']; // In real apps hash it!
+// Sanitize inputs
+$firstName = trim($_POST['firstName']);
+$lastName = trim($_POST['lastName']);
+$email = trim($_POST['email']);
+$dob = trim($_POST['dob']);
+$gender = isset($_POST['gender']) ? $_POST['gender'] : '';
+$phone = trim($_POST['phone']);
+$password = trim($_POST['password']);
 
-// Check if phone exists
-$check = $conn->query("SELECT phone FROM users WHERE phone='$phone'");
-if ($check->num_rows > 0) {
-    echo "Phone number already registered.";
+// Server-side validation
+$errors = [];
+
+// Phone format
+if (!preg_match('/^\d{3}-\d{3}-\d{4}$/', $phone)) {
+    $errors[] = "Phone must be in format 123-456-7890";
+}
+
+// Password length
+if (strlen($password) < 8) {
+    $errors[] = "Password must be at least 8 characters";
+}
+
+// Email format
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !str_ends_with($email, '.com')) {
+    $errors[] = "Email must include @ and end with .com";
+}
+
+// DOB format MM-DD-YYYY
+if (!preg_match('/^\d{2}-\d{2}-\d{4}$/', $dob)) {
+    $errors[] = "DOB must be MM-DD-YYYY";
+}
+
+// First and last name required
+if (empty($firstName) || empty($lastName)) {
+    $errors[] = "First and Last Name are required";
+}
+
+// Gender optional but if provided check
+if (!empty($gender) && !in_array($gender, ['Male','Female','Other'])) {
+    $errors[] = "Invalid gender selected";
+}
+
+// Check duplicate phone
+$check = $conn->prepare("SELECT phone FROM users WHERE phone=?");
+$check->bind_param("s", $phone);
+$check->execute();
+$result = $check->get_result();
+if ($result->num_rows > 0) {
+    $errors[] = "Phone number already registered";
+}
+
+if (!empty($errors)) {
+    echo implode("<br>", $errors);
     exit;
 }
 
-// Insert new user
-$sql = "INSERT INTO users (phone, password, firstName, lastName, dob, gender, email)
-        VALUES ('$phone', '$password', '$firstName', '$lastName', '$dob', '$gender', '$email')";
+// Hash password before saving
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-if ($conn->query($sql)) {
+// Insert into DB
+$stmt = $conn->prepare("INSERT INTO users (phone, password, firstName, lastName, dob, gender, email) VALUES (?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("sssssss", $phone, $hashedPassword, $firstName, $lastName, $dob, $gender, $email);
+
+if ($stmt->execute()) {
     echo "Registration successful!";
 } else {
-    echo "Error: " . $conn->error;
+    echo "Error: " . $stmt->error;
 }
 
+$stmt->close();
 $conn->close();
 ?>

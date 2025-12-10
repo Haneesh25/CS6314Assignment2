@@ -1,17 +1,15 @@
 <?php
 session_start();
 $servername = "localhost";
-$username = "root"; // your MySQL username
-$password_db = ""; // your MySQL password
+$username = "root";
+$password_db = "";
 $dbname = "travel_deals";
 
-// Connect
 $conn = new mysqli($servername, $username, $password_db, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Read POST data
 $phone = $_POST['phone'] ?? '';
 $password = $_POST['password'] ?? '';
 
@@ -20,7 +18,6 @@ if (!$phone || !$password) {
     exit;
 }
 
-// Prepare statement to prevent SQL injection
 $stmt = $conn->prepare("SELECT firstName, lastName, password FROM users WHERE phone = ?");
 $stmt->bind_param("s", $phone);
 $stmt->execute();
@@ -32,12 +29,12 @@ if ($stmt->num_rows === 0) {
     $stmt->bind_result($firstName, $lastName, $hashedPassword);
     $stmt->fetch();
 
-    // For now, assume password is plain text (update later for hashing)
-    if ($password === $hashedPassword) {
+    if (password_verify($password, $hashedPassword)) {
         $_SESSION['currentUser'] = [
             'phone' => $phone,
             'firstName' => $firstName,
-            'lastName' => $lastName
+            'lastName' => $lastName,
+            'isAdmin' => ($phone === '222-222-2222') ? true : false
         ];
         echo "success";
     } else {

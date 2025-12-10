@@ -41,12 +41,20 @@ document.addEventListener('DOMContentLoaded', function () {
             error: function () {
                 showError('loginMessage', 'Server error. Try again later.');
             }
-        });
+                });
     });
 });
 
 // Utility functions
-function showError(id, msg) { document.getElementById(id).textContent = msg; }
 function clearError(id) { document.getElementById(id).textContent = ""; }
-function showSuccess(id, msg) { document.getElementById(id).textContent = msg; }
+function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.color = 'red';
+}
+function showSuccess(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.color = 'green';
+}
 function clearMessage(id) { document.getElementById(id).textContent = ""; }

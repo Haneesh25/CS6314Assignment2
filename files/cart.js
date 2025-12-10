@@ -23,61 +23,94 @@ $(document).ready(function() {
 });
 
 function loadCart() {
-    const flightCart = JSON.parse(localStorage.getItem('flightCart'));
-    const hotelCart = JSON.parse(localStorage.getItem('hotelCart'));
-    const carCart = JSON.parse(localStorage.getItem('carCart'));
-    const cruiseCart = JSON.parse(localStorage.getItem('cruiseCart'));
-
     let totalAmount = 0;
     let hasItems = false;
 
+    // --- Flight cart loaded from server ---
+    $.ajax({
+        url: 'cart.php', // server returns JSON with cart info
+        method: 'GET',
+        dataType: 'json',
+        success: function(flightCart) {
+            if (flightCart && (flightCart.departingFlight || flightCart.returningFlight)) {
+                displayFlightCart(flightCart);
 
-    if (flightCart && (flightCart.departingFlight || flightCart.returningFlight)) {
-        displayFlightCart(flightCart);
+                if (flightCart.departingFlight) {
+                    const flight = flightCart.departingFlight;
+                    totalAmount += calculateFlightPrice(flight);
+                }
 
-        if (flightCart.departingFlight) {
-            const flight = flightCart.departingFlight;
-            const flightTotal = calculateFlightPrice(flight);
-            totalAmount += flightTotal;
+                if (flightCart.returningFlight) {
+                    const flight = flightCart.returningFlight;
+                    totalAmount += calculateFlightPrice(flight);
+                }
+
+                hasItems = true;
+            }
+
+            // --- Hotel, Car, Cruise still from localStorage ---
+            const hotelCart = JSON.parse(localStorage.getItem('hotelCart'));
+            const carCart = JSON.parse(localStorage.getItem('carCart'));
+            const cruiseCart = JSON.parse(localStorage.getItem('cruiseCart'));
+
+            if (hotelCart) {
+                displayHotelCart(hotelCart);
+                totalAmount += hotelCart.totalPrice;
+                hasItems = true;
+            }
+
+            if (carCart) {
+                displayCarCart(carCart);
+                totalAmount += carCart.totalPrice;
+                hasItems = true;
+            }
+
+            if (cruiseCart) {
+                displayCruiseCart(cruiseCart);
+                totalAmount += cruiseCart.totalPrice;
+                hasItems = true;
+            }
+
+            // --- Show totals or empty cart ---
+            if (hasItems) {
+                $('#totalAmount').text(totalAmount.toFixed(2));
+                $('#cartTotal').show();
+            } else {
+                $('#emptyCart').show();
+            }
+        },
+        error: function() {
+            // fallback if server fails: still load hotel/car/cruise
+            const hotelCart = JSON.parse(localStorage.getItem('hotelCart'));
+            const carCart = JSON.parse(localStorage.getItem('carCart'));
+            const cruiseCart = JSON.parse(localStorage.getItem('cruiseCart'));
+
+            if (hotelCart) {
+                displayHotelCart(hotelCart);
+                totalAmount += hotelCart.totalPrice;
+                hasItems = true;
+            }
+
+            if (carCart) {
+                displayCarCart(carCart);
+                totalAmount += carCart.totalPrice;
+                hasItems = true;
+            }
+
+            if (cruiseCart) {
+                displayCruiseCart(cruiseCart);
+                totalAmount += cruiseCart.totalPrice;
+                hasItems = true;
+            }
+
+            if (hasItems) {
+                $('#totalAmount').text(totalAmount.toFixed(2));
+                $('#cartTotal').show();
+            } else {
+                $('#emptyCart').show();
+            }
         }
-
-        if (flightCart.returningFlight) {
-            const flight = flightCart.returningFlight;
-            const flightTotal = calculateFlightPrice(flight);
-            totalAmount += flightTotal;
-        }
-
-        hasItems = true;
-    }
-
-
-    if (hotelCart) {
-        displayHotelCart(hotelCart);
-        totalAmount += hotelCart.totalPrice;
-        hasItems = true;
-    }
-
-
-    if (carCart) {
-        displayCarCart(carCart);
-        totalAmount += carCart.totalPrice;
-        hasItems = true;
-    }
-
-
-    if (cruiseCart) {
-        displayCruiseCart(cruiseCart);
-        totalAmount += cruiseCart.totalPrice;
-        hasItems = true;
-    }
-
-
-    if (hasItems) {
-        $('#totalAmount').text(totalAmount.toFixed(2));
-        $('#cartTotal').show();
-    } else {
-        $('#emptyCart').show();
-    }
+    });
 }
 
 function displayFlightCart(flightCart) {
@@ -251,9 +284,7 @@ function displayCruiseCart(cruiseCart) {
 }
 
 function bookFlight() {
-    const flightCart = JSON.parse(localStorage.getItem('flightCart'));
     const passengers = [];
-
 
     $('.passenger-section').each(function() {
         passengers.push({
@@ -264,30 +295,25 @@ function bookFlight() {
         });
     });
 
-
-    const bookingNumber = generateUniqueId('FLIGHT');
-    const userId = generateUniqueId('USER');
-
-    const booking = {
-        userId: userId,
-        bookingNumber: bookingNumber,
-        departingFlight: flightCart.departingFlight,
-        returningFlight: flightCart.returningFlight,
-        passengers: passengers,
-        bookingDate: new Date().toISOString()
-    };
-
-
-    saveToStorage('flightBookings', booking);
-
-
-    updateFlightAvailability(flightCart);
-
-
-    localStorage.removeItem('flightCart');
-
-
-    showBookingConfirmation('Flight', booking);
+    $.ajax({
+        url: 'book_flight.php',
+        method: 'POST',
+        data: { passengers: JSON.stringify(passengers) },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                $('#confirmationDetails').html(`
+                    <p>Booking Successful!</p>
+                    <p>Booking Number: ${response.bookingNumber}</p>
+                    <p>Booking Date: ${response.bookingDate}</p>
+                `);
+                $('#bookingConfirmation').show();
+                $('#flightCartSection, #cartTotal').hide();
+            } else {
+                alert('Booking failed: ' + response.message);
+            }
+        }
+    });
 }
 
 function bookHotel() {
