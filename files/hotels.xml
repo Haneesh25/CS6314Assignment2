@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hotels>
+    <hotel>
+        <hotel_id>2001</hotel_id>
+        <name>Luxury Downtown Houston</name>
+        <city>Houston</city>
+        <price_per_night>150.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2002</hotel_id>
+        <name>Budget Inn Houston</name>
+        <city>Houston</city>
+        <price_per_night>89.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2003</hotel_id>
+        <name>Grand Plaza Houston</name>
+        <city>Houston</city>
+        <price_per_night>120.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2004</hotel_id>
+        <name>Riverside Hotel Dallas</name>
+        <city>Dallas</city>
+        <price_per_night>130.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2005</hotel_id>
+        <name>Comfort Stay Dallas</name>
+        <city>Dallas</city>
+        <price_per_night>99.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2006</hotel_id>
+        <name>Elite Resort Dallas</name>
+        <city>Dallas</city>
+        <price_per_night>140.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2007</hotel_id>
+        <name>Austin City Hotel</name>
+        <city>Austin</city>
+        <price_per_night>125.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2008</hotel_id>
+        <name>Budget Austin Inn</name>
+        <city>Austin</city>
+        <price_per_night>85.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2009</hotel_id>
+        <name>Premium Stay Austin</name>
+        <city>Austin</city>
+        <price_per_night>135.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2010</hotel_id>
+        <name>San Antonio Plaza</name>
+        <city>San Antonio</city>
+        <price_per_night>110.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2011</hotel_id>
+        <name>Economy San Antonio</name>
+        <city>San Antonio</city>
+        <price_per_night>79.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2012</hotel_id>
+        <name>Fort Worth Suites</name>
+        <city>Fort Worth</city>
+        <price_per_night>105.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2013</hotel_id>
+        <name>El Paso Inn</name>
+        <city>El Paso</city>
+        <price_per_night>75.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2014</hotel_id>
+        <name>Los Angeles Grand</name>
+        <city>Los Angeles</city>
+        <price_per_night>160.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2015</hotel_id>
+        <name>LA Budget Inn</name>
+        <city>Los Angeles</city>
+        <price_per_night>95.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2016</hotel_id>
+        <name>San Francisco Bay Hotel</name>
+        <city>San Francisco</city>
+        <price_per_night>170.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2017</hotel_id>
+        <name>SF Budget Stay</name>
+        <city>San Francisco</city>
+        <price_per_night>100.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2018</hotel_id>
+        <name>San Diego Beach Resort</name>
+        <city>San Diego</city>
+        <price_per_night>155.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2019</hotel_id>
+        <name>Sacramento Inn</name>
+        <city>Sacramento</city>
+        <price_per_night>90.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2020</hotel_id>
+        <name>San Jose Tech Hotel</name>
+        <city>San Jose</city>
+        <price_per_night>125.00</price_per_night>
+    </hotel>
+    <hotel>
+        <hotel_id>2021</hotel_id>
+        <name>Fresno Central Hotel</name>
+        <city>Fresno</city>
+        <price_per_night>80.00</price_per_night>
+    </hotel>
+</hotels>

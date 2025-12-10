@@ -49,7 +49,7 @@ function loadCart() {
             }
 
             // --- Hotel, Car, Cruise still from localStorage ---
-            const hotelCart = JSON.parse(localStorage.getItem('hotelCart'));
+            const hotelCart = JSON.parse(sessionStorage.getItem('hotelCart'));
             const carCart = JSON.parse(localStorage.getItem('carCart'));
             const cruiseCart = JSON.parse(localStorage.getItem('cruiseCart'));
 
@@ -81,7 +81,7 @@ function loadCart() {
         },
         error: function() {
             // fallback if server fails: still load hotel/car/cruise
-            const hotelCart = JSON.parse(localStorage.getItem('hotelCart'));
+            const hotelCart = JSON.parse(sessionStorage.getItem('hotelCart'));
             const carCart = JSON.parse(localStorage.getItem('carCart'));
             const cruiseCart = JSON.parse(localStorage.getItem('cruiseCart'));
 
@@ -229,15 +229,15 @@ function calculateFlightPrice(flight) {
 function displayHotelCart(hotelCart) {
     const cartHTML = `
         <div class="cart-item">
-            <p><strong>Hotel:</strong> ${hotelCart.hotel.hotelName}</p>
-            <p><strong>Hotel ID:</strong> ${hotelCart.hotel.hotelId}</p>
-            <p><strong>City:</strong> ${hotelCart.hotel.city}</p>
+            <p><strong>Hotel:</strong> ${hotelCart.hotelName}</p>
+            <p><strong>Hotel ID:</strong> ${hotelCart.hotelId}</p>
+            <p><strong>City:</strong> ${hotelCart.city}</p>
             <p><strong>Check-in:</strong> ${hotelCart.checkInDate}</p>
             <p><strong>Check-out:</strong> ${hotelCart.checkOutDate}</p>
             <p><strong>Nights:</strong> ${hotelCart.nights}</p>
             <p><strong>Rooms:</strong> ${hotelCart.roomsNeeded}</p>
-            <p><strong>Guests:</strong> ${hotelCart.adultGuests} Adult(s), ${hotelCart.childGuests} Child(ren), ${hotelCart.infantGuests} Infant(s)</p>
-            <p><strong>Price per Night:</strong> $${hotelCart.hotel.pricePerNight}</p>
+            <p><strong>Guests:</strong> ${hotelCart.adults} Adult(s), ${hotelCart.children} Child(ren), ${hotelCart.infants} Infant(s)</p>
+            <p><strong>Price per Night:</strong> $${hotelCart.pricePerNight}</p>
             <p><strong>Total Price:</strong> $${hotelCart.totalPrice.toFixed(2)}</p>
         </div>
     `;
@@ -411,29 +411,171 @@ function displayBookingConfirmation(bookings) {
     $('#bookingConfirmation').show();
 }
 
+function generateHotelGuestForm(hotelCart) {
+    const totalGuests = hotelCart.adults + hotelCart.children + hotelCart.infants;
+    let formHTML = '';
+
+    let guestIndex = 0;
+    
+    // Adults
+    for (let i = 0; i < hotelCart.adults; i++) {
+        formHTML += `
+            <div class="guest-form-group">
+                <h5>Adult Guest ${i + 1}</h5>
+                <label>SSN (XXX-XX-XXXX):</label>
+                <input type="text" name="guests[${guestIndex}][ssn]" placeholder="XXX-XX-XXXX" class="guest-ssn" required>
+                
+                <label>First Name:</label>
+                <input type="text" name="guests[${guestIndex}][firstName]" placeholder="First Name" required>
+                
+                <label>Last Name:</label>
+                <input type="text" name="guests[${guestIndex}][lastName]" placeholder="Last Name" required>
+                
+                <label>Date of Birth (YYYY-MM-DD):</label>
+                <input type="date" name="guests[${guestIndex}][dob]" required>
+                
+                <input type="hidden" name="guests[${guestIndex}][category]" value="adult">
+            </div>
+        `;
+        guestIndex++;
+    }
+
+    // Children
+    for (let i = 0; i < hotelCart.children; i++) {
+        formHTML += `
+            <div class="guest-form-group">
+                <h5>Child Guest ${i + 1}</h5>
+                <label>SSN (XXX-XX-XXXX):</label>
+                <input type="text" name="guests[${guestIndex}][ssn]" placeholder="XXX-XX-XXXX" class="guest-ssn" required>
+                
+                <label>First Name:</label>
+                <input type="text" name="guests[${guestIndex}][firstName]" placeholder="First Name" required>
+                
+                <label>Last Name:</label>
+                <input type="text" name="guests[${guestIndex}][lastName]" placeholder="Last Name" required>
+                
+                <label>Date of Birth (YYYY-MM-DD):</label>
+                <input type="date" name="guests[${guestIndex}][dob]" required>
+                
+                <input type="hidden" name="guests[${guestIndex}][category]" value="child">
+            </div>
+        `;
+        guestIndex++;
+    }
+
+    // Infants
+    for (let i = 0; i < hotelCart.infants; i++) {
+        formHTML += `
+            <div class="guest-form-group">
+                <h5>Infant Guest ${i + 1}</h5>
+                <label>SSN (XXX-XX-XXXX):</label>
+                <input type="text" name="guests[${guestIndex}][ssn]" placeholder="XXX-XX-XXXX" class="guest-ssn" required>
+                
+                <label>First Name:</label>
+                <input type="text" name="guests[${guestIndex}][firstName]" placeholder="First Name" required>
+                
+                <label>Last Name:</label>
+                <input type="text" name="guests[${guestIndex}][lastName]" placeholder="Last Name" required>
+                
+                <label>Date of Birth (YYYY-MM-DD):</label>
+                <input type="date" name="guests[${guestIndex}][dob]" required>
+                
+                <input type="hidden" name="guests[${guestIndex}][category]" value="infant">
+            </div>
+        `;
+        guestIndex++;
+    }
+
+    $('#hotelGuestFields').html(formHTML);
+    $('#hotelGuestForm').show();
+
+    // Handle form submission
+    $('#hotelBookingForm').off('submit').on('submit', function(e) {
+        e.preventDefault();
+        submitHotelBooking(hotelCart, guestIndex);
+    });
+}
+
+function submitHotelBooking(hotelCart, guestCount) {
+    const formData = new FormData($('#hotelBookingForm')[0]);
+    
+    // Add hotel details
+    formData.append('hotel_id', hotelCart.hotelId);
+    formData.append('check_in', hotelCart.checkInDate);
+    formData.append('check_out', hotelCart.checkOutDate);
+    formData.append('num_rooms', hotelCart.roomsNeeded);
+    formData.append('price_per_night', hotelCart.pricePerNight);
+    formData.append('total_price', hotelCart.totalPrice);
+    formData.append('guest_count', guestCount);
+
+    $.ajax({
+        url: 'hotel-book.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            const data = JSON.parse(response);
+            if (data.success) {
+                displayHotelBookingConfirmation(data.booking, hotelCart);
+            } else {
+                alert('Booking failed: ' + data.message);
+            }
+        },
+        error: function() {
+            alert('Error processing hotel booking');
+        }
+    });
+}
+
+function displayHotelBookingConfirmation(booking, hotelCart) {
+    let confirmHTML = `
+        <div class="booking-confirmation">
+            <p><strong>Hotel Booking Confirmation</strong></p>
+            <p><strong>Booking ID:</strong> ${booking.hotel_booking_id}</p>
+            <p><strong>Hotel:</strong> ${booking.hotel_name} (ID: ${booking.hotel_id})</p>
+            <p><strong>City:</strong> ${booking.city}</p>
+            <p><strong>Check-in:</strong> ${booking.check_in}</p>
+            <p><strong>Check-out:</strong> ${booking.check_out}</p>
+            <p><strong>Rooms:</strong> ${booking.num_rooms}</p>
+            <p><strong>Price per Night:</strong> $${parseFloat(booking.price_per_night).toFixed(2)}</p>
+            <p><strong>Total Price:</strong> $${parseFloat(booking.total_price).toFixed(2)}</p>
+            
+            <h4>Guest Details:</h4>
+            <ul>
+    `;
+
+    booking.guests.forEach((guest, index) => {
+        confirmHTML += `
+            <li>
+                <strong>Guest ${index + 1} (${guest.category.charAt(0).toUpperCase() + guest.category.slice(1)}):</strong>
+                ${guest.first_name} ${guest.last_name}, SSN: ${guest.ssn}, DOB: ${guest.dob}
+            </li>
+        `;
+    });
+
+    confirmHTML += `
+            </ul>
+            <a href="index.html" class="btn">Return to Home</a>
+        </div>
+    `;
+
+    $('#confirmationDetails').html(confirmHTML);
+    $('#bookingConfirmation').show();
+    $('#hotelCartSection, #hotelGuestForm, #cartTotal').hide();
+}
+
 function bookHotel() {
-    const hotelCart = JSON.parse(localStorage.getItem('hotelCart'));
-    const bookingNumber = generateUniqueId('HOTEL');
-    const userId = generateUniqueId('USER');
+    const hotelCart = JSON.parse(sessionStorage.getItem('hotelCart'));
+    
+    if (!hotelCart) {
+        alert('No hotel in cart');
+        return;
+    }
 
-    const booking = {
-        userId: userId,
-        bookingNumber: bookingNumber,
-        ...hotelCart,
-        bookingDate: new Date().toISOString()
-    };
-
-
-    saveToStorage('hotelBookings', booking);
-
-
-    updateHotelAvailability(hotelCart);
-
-
-    localStorage.removeItem('hotelCart');
-
-
-    showBookingConfirmation('Hotel', booking);
+    // Hide cart display and show guest form
+    $('#hotelCartSection').hide();
+    generateHotelGuestForm(hotelCart);
 }
 
 function bookCar() {

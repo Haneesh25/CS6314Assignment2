@@ -26,6 +26,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     uploadFlights();
                 });
             }
+
+            // Setup hotel upload
+            const hotelUploadForm = document.getElementById('hotelUploadForm');
+            if (hotelUploadForm) {
+                hotelUploadForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    uploadHotels();
+                });
+            }
         })
         .catch(err => {
             console.error('Session check failed:', err);
@@ -65,6 +74,42 @@ function uploadFlights() {
             console.error(err);
             document.getElementById('uploadMessage').innerHTML = 
                 '<p style="color: red;">Error uploading flights</p>';
+        });
+    };
+    reader.readAsText(file);
+}
+
+function uploadHotels() {
+    const file = document.getElementById('hotelsFile').files[0];
+    if (!file) {
+        document.getElementById('hotelUploadMessage').innerHTML = 
+            '<p style="color: red;">Please select an XML file</p>';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const hotelsData = e.target.result;
+
+        fetch('admin-load-hotels.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/xml' },
+            body: hotelsData
+        })
+        .then(res => res.text())
+        .then(msg => {
+            if (msg.includes('Successfully')) {
+                document.getElementById('hotelUploadMessage').innerHTML = 
+                    '<p style="color: green;">' + msg + '</p>';
+            } else {
+                document.getElementById('hotelUploadMessage').innerHTML = 
+                    '<p style="color: red;">' + msg + '</p>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('hotelUploadMessage').innerHTML = 
+                '<p style="color: red;">Error uploading hotels</p>';
         });
     };
     reader.readAsText(file);
