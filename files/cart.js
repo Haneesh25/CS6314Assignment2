@@ -284,36 +284,131 @@ function displayCruiseCart(cruiseCart) {
 }
 
 function bookFlight() {
-    const passengers = [];
-
+    // Validate passenger fields
+    let isValid = true;
     $('.passenger-section').each(function() {
-        passengers.push({
-            firstName: $(this).find('.passenger-first-name').val(),
-            lastName: $(this).find('.passenger-last-name').val(),
-            dob: $(this).find('.passenger-dob').val(),
-            ssn: $(this).find('.passenger-ssn').val()
-        });
+        const firstName = $(this).find('.passenger-first-name').val().trim();
+        const lastName = $(this).find('.passenger-last-name').val().trim();
+        const dob = $(this).find('.passenger-dob').val();
+        const ssn = $(this).find('.passenger-ssn').val().trim();
+
+        if (!firstName || !lastName || !dob || !ssn) {
+            isValid = false;
+            alert('Please fill in all passenger information');
+            return false;
+        }
     });
 
+    if (!isValid) return;
+
+    // Collect passenger data organized by flight type
+    const passengersData = {
+        departing: [],
+        returning: []
+    };
+
+    const flightCart = JSON.parse(sessionStorage.getItem('flightCart') || '{}');
+    
+    // Count how many passengers for each flight type
+    if (flightCart.departingFlight) {
+        const totalPassengers = flightCart.departingFlight.adults + flightCart.departingFlight.children + flightCart.departingFlight.infants;
+        for (let i = 0; i < totalPassengers; i++) {
+            passengersData.departing.push({
+                firstName: $($('.passenger-section')[i]).find('.passenger-first-name').val(),
+                lastName: $($('.passenger-section')[i]).find('.passenger-last-name').val(),
+                dob: $($('.passenger-section')[i]).find('.passenger-dob').val(),
+                ssn: $($('.passenger-section')[i]).find('.passenger-ssn').val()
+            });
+        }
+    }
+
+    if (flightCart.returningFlight) {
+        const totalPassengers = flightCart.returningFlight.adults + flightCart.returningFlight.children + flightCart.returningFlight.infants;
+        const departingCount = flightCart.departingFlight ? flightCart.departingFlight.adults + flightCart.departingFlight.children + flightCart.departingFlight.infants : 0;
+        
+        for (let i = 0; i < totalPassengers; i++) {
+            passengersData.returning.push({
+                firstName: $($('.passenger-section')[departingCount + i]).find('.passenger-first-name').val(),
+                lastName: $($('.passenger-section')[departingCount + i]).find('.passenger-last-name').val(),
+                dob: $($('.passenger-section')[departingCount + i]).find('.passenger-dob').val(),
+                ssn: $($('.passenger-section')[departingCount + i]).find('.passenger-ssn').val()
+            });
+        }
+    }
+
     $.ajax({
-        url: 'book_flight.php',
+        url: 'flight-book.php',
         method: 'POST',
-        data: { passengers: JSON.stringify(passengers) },
+        data: { passengers: passengersData },
         dataType: 'json',
         success: function(response) {
-            if (response.status === 'success') {
-                $('#confirmationDetails').html(`
-                    <p>Booking Successful!</p>
-                    <p>Booking Number: ${response.bookingNumber}</p>
-                    <p>Booking Date: ${response.bookingDate}</p>
-                `);
-                $('#bookingConfirmation').show();
-                $('#flightCartSection, #cartTotal').hide();
+            if (response.success) {
+                displayBookingConfirmation(response.bookings);
+                $('#flightPassengerForm, #flightCartSection, #cartTotal').hide();
             } else {
                 alert('Booking failed: ' + response.message);
             }
+        },
+        error: function(err) {
+            console.error(err);
+            alert('Error booking flight. Please try again.');
         }
     });
+}
+
+function displayBookingConfirmation(bookings) {
+    let confirmationHTML = '<h3>Booking Confirmation</h3>';
+
+    bookings.forEach(booking => {
+        confirmationHTML += `
+            <div style="border: 2px solid #4CAF50; padding: 20px; margin: 15px 0; border-radius: 5px; background-color: #f0f8f0;">
+                <h4 style="color: #2c5f2d; text-transform: uppercase; margin-bottom: 15px;">
+                    ${booking.flight_type === 'departing' ? '✈ Departing Flight' : '✈ Returning Flight'}
+                </h4>
+
+                <!-- FLIGHT BOOKING DETAILS -->
+                <div style="background-color: #e8f5e9; padding: 15px; border-radius: 3px; margin-bottom: 15px;">
+                    <p><strong>Flight Booking ID:</strong> ${booking.flight_booking_id}</p>
+                    <p><strong>Flight ID:</strong> ${booking.flight_id}</p>
+                    <p><strong>Route:</strong> ${booking.origin} → ${booking.destination}</p>
+                    <p><strong>Departure Date:</strong> ${booking.departure_date} at ${booking.departure_time}</p>
+                    <p><strong>Arrival Date:</strong> ${booking.arrival_date} at ${booking.arrival_time}</p>
+                    <p><strong style="color: #d32f2f; font-size: 16px;">Total Price: $${parseFloat(booking.total_price).toFixed(2)}</strong></p>
+                </div>
+
+                <!-- TICKET DETAILS -->
+                <div style="margin-top: 15px;">
+                    <h5 style="color: #1976d2; margin-bottom: 10px;">Passenger Tickets</h5>
+        `;
+
+        booking.tickets.forEach((ticket, index) => {
+            confirmationHTML += `
+                <div style="background-color: #e3f2fd; padding: 12px; border-left: 4px solid #1976d2; margin-bottom: 10px; border-radius: 2px;">
+                    <p><strong>Ticket ${index + 1}</strong></p>
+                    <p style="margin: 5px 0;"><strong>Ticket ID:</strong> ${ticket.ticket_id}</p>
+                    <p style="margin: 5px 0;"><strong>Name:</strong> ${ticket.first_name} ${ticket.last_name}</p>
+                    <p style="margin: 5px 0;"><strong>SSN:</strong> ${ticket.ssn}</p>
+                    <p style="margin: 5px 0;"><strong>Date of Birth:</strong> ${ticket.dob}</p>
+                    <p style="margin: 5px 0;"><strong>Category:</strong> <span style="text-transform: capitalize; font-weight: bold; color: #d32f2f;">${ticket.category}</span></p>
+                    <p style="margin: 5px 0;"><strong>Price:</strong> $${parseFloat(ticket.price).toFixed(2)}</p>
+                </div>
+            `;
+        });
+
+        confirmationHTML += `
+                </div>
+            </div>
+        `;
+    });
+
+    confirmationHTML += `
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="index.html" class="btn" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; display: inline-block;">Return to Home</a>
+        </div>
+    `;
+
+    $('#confirmationDetails').html(confirmationHTML);
+    $('#bookingConfirmation').show();
 }
 
 function bookHotel() {
