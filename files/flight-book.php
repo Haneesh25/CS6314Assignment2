@@ -56,6 +56,35 @@ try {
         }
     }
 
+    $firstName = $_POST['passengers'][$flightType][$i]['firstName'] ?? '';
+    $lastName = $_POST['passengers'][$flightType][$i]['lastName'] ?? '';
+    $dob = $_POST['passengers'][$flightType][$i]['dob'] ?? '';
+    $category = ($i < $flight['adults']) ? 'adult' : (($i < $flight['adults'] + $flight['children']) ? 'child' : 'infant');
+
+    $passengerStmt = $pdo->prepare("
+        INSERT INTO passengers (ssn, first_name, last_name, dob, category)
+        VALUES (:ssn, :first_name, :last_name, :dob, :category)
+        ON DUPLICATE KEY UPDATE first_name=:first_name, last_name=:last_name
+    ");
+    $passengerStmt->execute([
+        ':ssn' => $ssn,
+        ':first_name' => $firstName,
+        ':last_name' => $lastName,
+        ':dob' => $dob,
+        ':category' => $category
+    ]);
+
+    // Update available seats
+    $updateSeats = $pdo->prepare("
+        UPDATE flights 
+        SET availableSeats = availableSeats - :passengers 
+        WHERE flight_id = :flight_id
+    ");
+    $updateSeats->execute([
+        ':passengers' => $flight['total_passengers'],
+        ':flight_id' => $flight['flightId']
+    ]);
+
     // Clear cart
     unset($_SESSION['cart']);
 
