@@ -6,16 +6,13 @@ $(document).ready(function() {
         bookFlight();
     });
 
-
     $('#bookHotelBtn').on('click', function() {
         bookHotel();
     });
 
-
     $('#bookCarBtn').on('click', function() {
         bookCar();
     });
-
 
     $('#bookCruiseBtn').on('click', function() {
         bookCruise();
@@ -30,7 +27,6 @@ function loadCart() {
 
     let totalAmount = 0;
     let hasItems = false;
-
 
     if (flightCart && (flightCart.departingFlight || flightCart.returningFlight)) {
         displayFlightCart(flightCart);
@@ -50,13 +46,11 @@ function loadCart() {
         hasItems = true;
     }
 
-
     if (hotelCart) {
         displayHotelCart(hotelCart);
         totalAmount += hotelCart.totalPrice;
         hasItems = true;
     }
-
 
     if (carCart) {
         displayCarCart(carCart);
@@ -64,13 +58,11 @@ function loadCart() {
         hasItems = true;
     }
 
-
     if (cruiseCart) {
         displayCruiseCart(cruiseCart);
         totalAmount += cruiseCart.totalPrice;
         hasItems = true;
     }
-
 
     if (hasItems) {
         $('#totalAmount').text(totalAmount.toFixed(2));
@@ -132,7 +124,6 @@ function displayFlightCart(flightCart) {
     $('#flightCartContent').html(cartHTML);
     $('#flightCartSection').show();
 
-
     generatePassengerForm(flightCart);
 }
 
@@ -143,16 +134,13 @@ function generatePassengerForm(flightCart) {
     let formHTML = '';
     let passengerCount = 1;
 
-
     for (let i = 0; i < flight.adults; i++) {
         formHTML += createPassengerFields(passengerCount++, 'Adult');
     }
 
-
     for (let i = 0; i < flight.children; i++) {
         formHTML += createPassengerFields(passengerCount++, 'Child');
     }
-
 
     for (let i = 0; i < flight.infants; i++) {
         formHTML += createPassengerFields(passengerCount++, 'Infant');
@@ -211,6 +199,52 @@ function displayHotelCart(hotelCart) {
 
     $('#hotelCartContent').html(cartHTML);
     $('#hotelCartSection').show();
+    
+    generateGuestForm(hotelCart);
+}
+
+function generateGuestForm(hotelCart) {
+    let formHTML = '<h4>Guest Information</h4>';
+    let guestCount = 1;
+
+    for (let i = 0; i < hotelCart.adultGuests; i++) {
+        formHTML += createGuestFields(guestCount++, 'Adult');
+    }
+
+    for (let i = 0; i < hotelCart.childGuests; i++) {
+        formHTML += createGuestFields(guestCount++, 'Child');
+    }
+
+    for (let i = 0; i < hotelCart.infantGuests; i++) {
+        formHTML += createGuestFields(guestCount++, 'Infant');
+    }
+
+    $('#hotelGuestForm').html(formHTML);
+    $('#hotelGuestFormSection').show();
+}
+
+function createGuestFields(number, type) {
+    return `
+        <div class="guest-section" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+            <h5>Guest ${number} (${type})</h5>
+            <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" class="guest-first-name" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" class="guest-last-name" required>
+            </div>
+            <div class="form-group">
+                <label>Date of Birth *</label>
+                <input type="date" class="guest-dob" required>
+            </div>
+            <div class="form-group">
+                <label>SSN *</label>
+                <input type="text" class="guest-ssn" pattern="[0-9]{3}-[0-9]{2}-[0-9]{4}" placeholder="123-45-6789" required>
+            </div>
+        </div>
+    `;
 }
 
 function displayCarCart(carCart) {
@@ -254,7 +288,6 @@ function bookFlight() {
     const flightCart = JSON.parse(localStorage.getItem('flightCart'));
     const passengers = [];
 
-    // Collect passenger data
     $('.passenger-section').each(function(index) {
         const typeText = $(this).find('h5').text();
         const category = typeText.includes('Adult') ? 'adult' :
@@ -276,33 +309,30 @@ function bookFlight() {
         });
     });
 
-    const flightBookingId = generateUniqueId('FLIGHT');
+    const departingBookingId = generateUniqueId('FLIGHT');
+    const returningBookingId = flightCart.returningFlight ? generateUniqueId('FLIGHT') : null;
 
-    // Calculate total price
     let totalPrice = 0;
     passengers.forEach(p => totalPrice += parseFloat(p.price));
 
-    // Prepare booking data for database
-    const bookingData = {
-        flightBookingId: flightBookingId,
+    const departingBookingData = {
+        flightBookingId: departingBookingId,
         flightId: flightCart.departingFlight.flightId,
         totalPrice: totalPrice,
         passengers: passengers
     };
 
-    // Save to database via AJAX
     $.ajax({
         url: 'book-flight.php',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify(bookingData),
+        data: JSON.stringify(departingBookingData),
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                // Also save returning flight if exists
                 if (flightCart.returningFlight) {
                     const returnBookingData = {
-                        flightBookingId: generateUniqueId('FLIGHT'),
+                        flightBookingId: returningBookingId,
                         flightId: flightCart.returningFlight.flightId,
                         totalPrice: totalPrice,
                         passengers: passengers
@@ -314,25 +344,31 @@ function bookFlight() {
                         contentType: 'application/json',
                         data: JSON.stringify(returnBookingData),
                         dataType: 'json',
-                        success: function() {
-                            localStorage.removeItem('flightCart');
-                            showBookingConfirmation('Flight', {
-                                bookingNumber: response.bookingId,
-                                userId: generateUniqueId('USER'),
-                                bookingDate: new Date().toISOString()
-                            });
+                        success: function(returnResponse) {
+                            if (returnResponse.success) {
+                                localStorage.removeItem('flightCart');
+                                showFlightBookingConfirmation(
+                                    flightCart, 
+                                    passengers, 
+                                    departingBookingId, 
+                                    returningBookingId
+                                );
+                            } else {
+                                alert('Error booking return flight: ' + returnResponse.message);
+                            }
                         },
                         error: function() {
-                            alert('Error booking return flight');
+                            alert('Error connecting to server for return flight');
                         }
                     });
                 } else {
                     localStorage.removeItem('flightCart');
-                    showBookingConfirmation('Flight', {
-                        bookingNumber: response.bookingId,
-                        userId: generateUniqueId('USER'),
-                        bookingDate: new Date().toISOString()
-                    });
+                    showFlightBookingConfirmation(
+                        flightCart, 
+                        passengers, 
+                        departingBookingId, 
+                        null
+                    );
                 }
             } else {
                 alert('Booking failed: ' + response.message);
@@ -345,39 +381,36 @@ function bookFlight() {
     });
 }
 
-
 function bookHotel() {
     const hotelCart = JSON.parse(localStorage.getItem('hotelCart'));
     const hotelBookingId = generateUniqueId('HOTEL');
 
-    // Create guest data (simplified - using dummy SSNs)
     const guests = [];
-    for (let i = 0; i < hotelCart.adultGuests; i++) {
+    
+    $('.guest-section').each(function(index) {
+        const typeText = $(this).find('h5').text();
+        const category = typeText.includes('Adult') ? 'adult' :
+            typeText.includes('Child') ? 'child' : 'infant';
+
         guests.push({
-            ssn: '000-00-' + String(1000 + i + Math.floor(Math.random() * 9000)).padStart(4, '0'),
-            firstName: 'Guest',
-            lastName: 'Adult' + (i + 1),
-            dob: '1990-01-01',
-            category: 'adult'
+            ssn: $(this).find('.guest-ssn').val(),
+            firstName: $(this).find('.guest-first-name').val(),
+            lastName: $(this).find('.guest-last-name').val(),
+            dob: $(this).find('.guest-dob').val(),
+            category: category
         });
-    }
-    for (let i = 0; i < hotelCart.childGuests; i++) {
-        guests.push({
-            ssn: '000-00-' + String(2000 + i + Math.floor(Math.random() * 9000)).padStart(4, '0'),
-            firstName: 'Guest',
-            lastName: 'Child' + (i + 1),
-            dob: '2010-01-01',
-            category: 'child'
-        });
-    }
-    for (let i = 0; i < hotelCart.infantGuests; i++) {
-        guests.push({
-            ssn: '000-00-' + String(3000 + i + Math.floor(Math.random() * 9000)).padStart(4, '0'),
-            firstName: 'Guest',
-            lastName: 'Infant' + (i + 1),
-            dob: '2022-01-01',
-            category: 'infant'
-        });
+    });
+
+    let allFieldsFilled = true;
+    guests.forEach(guest => {
+        if (!guest.firstName || !guest.lastName || !guest.dob || !guest.ssn) {
+            allFieldsFilled = false;
+        }
+    });
+
+    if (!allFieldsFilled) {
+        alert('Please fill in all guest information fields');
+        return;
     }
 
     const bookingData = {
@@ -391,7 +424,6 @@ function bookHotel() {
         guests: guests
     };
 
-    // Save to database via AJAX
     $.ajax({
         url: 'book-hotel.php',
         type: 'POST',
@@ -401,11 +433,7 @@ function bookHotel() {
         success: function(response) {
             if (response.success) {
                 localStorage.removeItem('hotelCart');
-                showBookingConfirmation('Hotel', {
-                    bookingNumber: response.bookingId,
-                    userId: generateUniqueId('USER'),
-                    bookingDate: new Date().toISOString()
-                });
+                showHotelBookingConfirmation(hotelCart, guests, hotelBookingId);
             } else {
                 alert('Booking failed: ' + response.message);
             }
@@ -416,7 +444,6 @@ function bookHotel() {
         }
     });
 }
-
 
 function bookCar() {
     const carCart = JSON.parse(localStorage.getItem('carCart'));
@@ -430,16 +457,9 @@ function bookCar() {
         bookingDate: new Date().toISOString()
     };
 
-
     saveToStorage('carBookings', booking);
-
-
     updateCarAvailability(carCart);
-
-
     localStorage.removeItem('carCart');
-
-
     showBookingConfirmation('Car', booking);
 }
 
@@ -455,14 +475,104 @@ function bookCruise() {
         bookingDate: new Date().toISOString()
     };
 
-
     saveToStorage('cruiseBookings', booking);
-
-
     localStorage.removeItem('cruiseCart');
-
-
     showBookingConfirmation('Cruise', booking);
+}
+
+function showFlightBookingConfirmation(flightCart, passengers, departingBookingId, returningBookingId) {
+    let confirmationHTML = '<h2>Booking Successful!</h2>';
+    
+    if (flightCart.departingFlight) {
+        const flight = flightCart.departingFlight;
+        const totalPrice = calculateFlightPrice(flight);
+        
+        confirmationHTML += '<h3>✈️ DEPARTING FLIGHT</h3>';
+        confirmationHTML += '<p><strong>Flight Booking ID:</strong> ' + departingBookingId + '</p>';
+        confirmationHTML += '<p><strong>Flight ID:</strong> ' + flight.flightId + '</p>';
+        confirmationHTML += '<p><strong>Route:</strong> ' + flight.origin + ' → ' + flight.destination + '</p>';
+        confirmationHTML += '<p><strong>Departure Date:</strong> ' + flight.departureDate + ' at ' + flight.departureTime + '</p>';
+        confirmationHTML += '<p><strong>Arrival Date:</strong> ' + flight.departureDate + ' at ' + flight.arrivalTime + '</p>';
+        confirmationHTML += '<p><strong>Total Price:</strong> $' + totalPrice.toFixed(2) + '</p>';
+        
+        confirmationHTML += '<h4>Passenger Tickets</h4>';
+        passengers.forEach((passenger, index) => {
+            confirmationHTML += '<div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">';
+            confirmationHTML += '<p><strong>Ticket ' + (index + 1) + '</strong></p>';
+            confirmationHTML += '<p><strong>Ticket ID:</strong> ' + passenger.ticketId + '</p>';
+            confirmationHTML += '<p><strong>Name:</strong> ' + passenger.firstName + ' ' + passenger.lastName + '</p>';
+            confirmationHTML += '<p><strong>SSN:</strong> ' + passenger.ssn + '</p>';
+            confirmationHTML += '<p><strong>Date of Birth:</strong> ' + passenger.dob + '</p>';
+            confirmationHTML += '<p><strong>Category:</strong> ' + passenger.category.charAt(0).toUpperCase() + passenger.category.slice(1) + '</p>';
+            confirmationHTML += '<p><strong>Price:</strong> $' + parseFloat(passenger.price).toFixed(2) + '</p>';
+            confirmationHTML += '</div>';
+        });
+    }
+    
+    if (flightCart.returningFlight && returningBookingId) {
+        const flight = flightCart.returningFlight;
+        const totalPrice = calculateFlightPrice(flight);
+        
+        confirmationHTML += '<h3>✈️ RETURNING FLIGHT</h3>';
+        confirmationHTML += '<p><strong>Flight Booking ID:</strong> ' + returningBookingId + '</p>';
+        confirmationHTML += '<p><strong>Flight ID:</strong> ' + flight.flightId + '</p>';
+        confirmationHTML += '<p><strong>Route:</strong> ' + flight.origin + ' → ' + flight.destination + '</p>';
+        confirmationHTML += '<p><strong>Departure Date:</strong> ' + flight.departureDate + ' at ' + flight.departureTime + '</p>';
+        confirmationHTML += '<p><strong>Arrival Date:</strong> ' + flight.departureDate + ' at ' + flight.arrivalTime + '</p>';
+        confirmationHTML += '<p><strong>Total Price:</strong> $' + totalPrice.toFixed(2) + '</p>';
+        
+        confirmationHTML += '<h4>Passenger Tickets</h4>';
+        passengers.forEach((passenger, index) => {
+            confirmationHTML += '<div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">';
+            confirmationHTML += '<p><strong>Ticket ' + (index + 1) + '</strong></p>';
+            confirmationHTML += '<p><strong>Ticket ID:</strong> ' + passenger.ticketId + '</p>';
+            confirmationHTML += '<p><strong>Name:</strong> ' + passenger.firstName + ' ' + passenger.lastName + '</p>';
+            confirmationHTML += '<p><strong>SSN:</strong> ' + passenger.ssn + '</p>';
+            confirmationHTML += '<p><strong>Date of Birth:</strong> ' + passenger.dob + '</p>';
+            confirmationHTML += '<p><strong>Category:</strong> ' + passenger.category.charAt(0).toUpperCase() + passenger.category.slice(1) + '</p>';
+            confirmationHTML += '<p><strong>Price:</strong> $' + parseFloat(passenger.price).toFixed(2) + '</p>';
+            confirmationHTML += '</div>';
+        });
+    }
+    
+    confirmationHTML += '<a href="index.html" class="btn">Return to Home</a>';
+
+    $('#confirmationDetails').html(confirmationHTML);
+    $('#bookingConfirmation').show();
+    $('#flightCartSection, #hotelCartSection, #carCartSection, #cruiseCartSection, #cartTotal').hide();
+}
+
+function showHotelBookingConfirmation(hotelCart, guests, hotelBookingId) {
+    let confirmationHTML = '<h2>Hotel Booking Successful!</h2>';
+    
+    confirmationHTML += '<h3>🏨 HOTEL BOOKING</h3>';
+    confirmationHTML += '<p><strong>Hotel Booking ID:</strong> ' + hotelBookingId + '</p>';
+    confirmationHTML += '<p><strong>Hotel ID:</strong> ' + hotelCart.hotel.hotelId + '</p>';
+    confirmationHTML += '<p><strong>Hotel Name:</strong> ' + hotelCart.hotel.hotelName + '</p>';
+    confirmationHTML += '<p><strong>City:</strong> ' + hotelCart.hotel.city + '</p>';
+    confirmationHTML += '<p><strong>Check-in Date:</strong> ' + hotelCart.checkInDate + '</p>';
+    confirmationHTML += '<p><strong>Check-out Date:</strong> ' + hotelCart.checkOutDate + '</p>';
+    confirmationHTML += '<p><strong>Number of Rooms:</strong> ' + hotelCart.roomsNeeded + '</p>';
+    confirmationHTML += '<p><strong>Price per Night:</strong> $' + hotelCart.hotel.pricePerNight.toFixed(2) + '</p>';
+    confirmationHTML += '<p><strong>Number of Nights:</strong> ' + hotelCart.nights + '</p>';
+    confirmationHTML += '<p><strong>Total Price:</strong> $' + hotelCart.totalPrice.toFixed(2) + '</p>';
+    
+    confirmationHTML += '<h4>Guest Information</h4>';
+    guests.forEach((guest, index) => {
+        confirmationHTML += '<div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">';
+        confirmationHTML += '<p><strong>Guest ' + (index + 1) + '</strong></p>';
+        confirmationHTML += '<p><strong>Name:</strong> ' + guest.firstName + ' ' + guest.lastName + '</p>';
+        confirmationHTML += '<p><strong>SSN:</strong> ' + guest.ssn + '</p>';
+        confirmationHTML += '<p><strong>Date of Birth:</strong> ' + guest.dob + '</p>';
+        confirmationHTML += '<p><strong>Category:</strong> ' + guest.category.charAt(0).toUpperCase() + guest.category.slice(1) + '</p>';
+        confirmationHTML += '</div>';
+    });
+    
+    confirmationHTML += '<a href="index.html" class="btn">Return to Home</a>';
+
+    $('#confirmationDetails').html(confirmationHTML);
+    $('#bookingConfirmation').show();
+    $('#flightCartSection, #hotelCartSection, #carCartSection, #cruiseCartSection, #cartTotal').hide();
 }
 
 function showBookingConfirmation(type, booking) {
@@ -477,14 +587,10 @@ function showBookingConfirmation(type, booking) {
 
     $('#confirmationDetails').html(confirmationHTML);
     $('#bookingConfirmation').show();
-
-
     $('#flightCartSection, #hotelCartSection, #carCartSection, #cruiseCartSection, #cartTotal').hide();
 }
 
 function updateFlightAvailability(flightCart) {
-
-
     const flights = JSON.parse(localStorage.getItem('availableFlights')) || [];
 
     if (flightCart.departingFlight) {
@@ -507,13 +613,9 @@ function updateFlightAvailability(flightCart) {
 }
 
 function updateHotelAvailability(hotelCart) {
-
-
     console.log('Hotel availability updated for', hotelCart.hotel.hotelId);
 }
 
 function updateCarAvailability(carCart) {
-
-
     console.log('Car availability updated for', carCart.car.carId);
 }
