@@ -39,10 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showError('dobError', 'DOB must be MM-DD-YYYY');
             valid = false;
         }
-        if (!gender) {
-            showError('genderError', 'Please select a gender');
-            valid = false;
-        }
+    
         if (!/^\d{3}-\d{3}-\d{4}$/.test(phone)) {
             showError('phoneError', 'Phone must be 123-456-7890');
             valid = false;
@@ -67,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 lastName,
                 email,
                 dob,
-                gender: gender.value,
+                gender: gender ? gender.value : '',
                 phone,
                 password
             },
