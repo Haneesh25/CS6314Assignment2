@@ -79,6 +79,118 @@
                         <p>No bookings yet.</p>
                     </div>
                 </div>
+                
+                <!-- Add this before the closing </main> tag -->
+
+                <div id="querySection" style="margin-top: 30px;">
+                    <h3>Query & Reporting</h3>
+                    
+                    <!-- User Queries -->
+                    <div id="userQueries" style="margin-bottom: 30px;">
+                        <h4>Your Bookings</h4>
+                        
+                        <!-- Query: Flight Booking by ID -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Find Flight Booking by ID</h5>
+                            <input type="number" id="flightBookingId" placeholder="Enter Flight Booking ID">
+                            <button class="btn" onclick="queryFlightBooking()">Search</button>
+                            <div id="flightBookingResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Query: Hotel Booking by ID -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Find Hotel Booking by ID</h5>
+                            <input type="number" id="hotelBookingId" placeholder="Enter Hotel Booking ID">
+                            <button class="btn" onclick="queryHotelBooking()">Search</button>
+                            <div id="hotelBookingResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Query: Passengers by Flight Booking -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Find Passengers in Flight Booking</h5>
+                            <input type="number" id="passengerFlightId" placeholder="Enter Flight Booking ID">
+                            <button class="btn" onclick="queryPassengersInFlight()">Search</button>
+                            <div id="passengersResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Query: All Bookings for SEP 2024 -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>All Bookings for September 2024</h5>
+                            <button class="btn" onclick="queryAllSep2024()">Get All Bookings</button>
+                            <div id="sep2024Result" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Query: Bookings by SSN -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Find Your Bookings by SSN</h5>
+                            <input type="text" id="personSSN" placeholder="Enter your SSN (XXX-XX-XXXX)">
+                            <button class="btn" onclick="queryBookingsBySSN()">Search</button>
+                            <div id="ssnBookingsResult" style="margin-top: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Queries -->
+                    <div id="adminQueries" style="display:none; margin-bottom: 30px;">
+                        <h4>Admin Reporting & Analytics</h4>
+
+                        <!-- Admin Query: Texas Flights SEP-OCT -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Flights from Texas (SEP-OCT 2024)</h5>
+                            <button class="btn" onclick="queryAdminTexasFlights()">Get Flights</button>
+                            <div id="texasFlightsResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Admin Query: Texas Hotels SEP-OCT -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Hotels in Texas (SEP-OCT 2024)</h5>
+                            <button class="btn" onclick="queryAdminTexasHotels()">Get Hotels</button>
+                            <div id="texasHotelsResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Admin Query: Most Expensive Hotels -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Top 10 Most Expensive Hotel Bookings</h5>
+                            <button class="btn" onclick="queryAdminExpensiveHotels()">Get Hotels</button>
+                            <div id="expensiveHotelsResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Admin Query: Flights with Infants -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Flights with Infant Passengers</h5>
+                            <button class="btn" onclick="queryAdminInfantFlights()">Get Flights</button>
+                            <div id="infantFlightsResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Admin Query: Flights with Infants & 5+ Children -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Flights with Infants AND At Least 5 Children</h5>
+                            <button class="btn" onclick="queryAdminInfantChildrenFlights()">Get Flights</button>
+                            <div id="infantChildrenFlightsResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Admin Query: Most Expensive Flights -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Top 10 Most Expensive Flight Bookings</h5>
+                            <button class="btn" onclick="queryAdminExpensiveFlights()">Get Flights</button>
+                            <div id="expensiveFlightsResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Admin Query: Texas Flights No Infants -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Texas Flights with NO Infant Passengers</h5>
+                            <button class="btn" onclick="queryAdminTexasNoInfant()">Get Flights</button>
+                            <div id="texasNoInfantResult" style="margin-top: 10px;"></div>
+                        </div>
+
+                        <!-- Admin Query: California Arrivals Count -->
+                        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;">
+                            <h5>Flights Arriving in California (SEP-OCT 2024) - Count</h5>
+                            <button class="btn" onclick="queryAdminCaliforniaArrivals()">Get Count</button>
+                            <div id="californiaArrivalsResult" style="margin-top: 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
 
